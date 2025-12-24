@@ -1,6 +1,6 @@
 /**
- * Token Socket Handler
- * Handles Socket.IO connections for token updates
+ * Token WebSocket Handler
+ * Handles WebSocket connections for token updates
  */
 
 let tokenUpdateManager;
@@ -14,26 +14,32 @@ function initializeHandler(updateManager) {
 }
 
 /**
- * Handle token socket connections
+ * Handle token WebSocket connections
  */
-function handleConnection(socket) {
+function handleConnection(ws) {
   console.log('🔌 New client connected to token updates');
 
-  // Join the tokens room
-  socket.join('tokens');
+  // Add to tokens room
+  tokenUpdateManager.addClient(ws);
 
   // Send welcome message
-  socket.emit('connected', {
-    message: 'Connected to token updates channel',
-    timestamp: new Date().toISOString(),
-  });
+  ws.send(
+    JSON.stringify({
+      type: 'connected',
+      message: 'Connected to token updates channel',
+      timestamp: new Date().toISOString(),
+    })
+  );
 
-  socket.on('disconnect', () => {
+  // Handle client disconnect
+  ws.on('close', () => {
+    tokenUpdateManager.removeClient(ws);
     console.log('🔌 Client disconnected from token updates');
   });
 
-  socket.on('error', error => {
-    console.error('❌ Socket.IO error (tokens):', error);
+  ws.on('error', error => {
+    console.error('❌ WebSocket error (tokens):', error);
+    tokenUpdateManager.removeClient(ws);
   });
 }
 

@@ -10,9 +10,10 @@ const { generateDeltaUpdate } = require('./mockData');
  * Manages the logic for updating tokens and broadcasting changes
  */
 class TokenUpdateManager {
-  constructor(tokens, io) {
+  constructor(tokens, wss) {
     this.tokens = tokens;
-    this.io = io;
+    this.wss = wss;
+    this.tokenClients = new Set(); // Clients in tokens room
     this.updateInterval = null;
     this.isRunning = false;
   }
@@ -36,15 +37,17 @@ class TokenUpdateManager {
   }
 
   /**
-   * Stop the token update cycle
+   * Add a client to the tokens room
    */
-  stop() {
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-      this.updateInterval = null;
-      this.isRunning = false;
-      console.log('⏹️  Token updates stopped');
-    }
+  addClient(ws) {
+    this.tokenClients.add(ws);
+  }
+
+  /**
+   * Remove a client from the tokens room
+   */
+  removeClient(ws) {
+    this.tokenClients.delete(ws);
   }
 
   /**
@@ -75,7 +78,7 @@ class TokenUpdateManager {
    * Now includes room categorization
    */
   broadcastSingleTokenUpdate() {
-    const clientCount = this.io.sockets.adapter.rooms.get('tokens')?.size || 0;
+    const clientCount = this.tokenClients.size;
     if (clientCount === 0) {
       return; // No clients connected
     }
@@ -108,7 +111,20 @@ class TokenUpdateManager {
     };
 
     // Broadcast to all connected clients in the tokens room
-    this.io.to('tokens').emit('token_update', message);
+    const messageStr = JSON.stringify({
+      type: 'token_update',
+      room: room,
+      timestamp: new Date().toISOString(),
+      content: {
+        id: token.id,
+        delta: delta,
+      },
+    });
+    this.tokenClients.forEach(ws => {
+      if (ws.readyState === ws.OPEN) {
+        ws.send(messageStr);
+      }
+    });
 
     if (clientCount > 0) {
       console.log(
@@ -131,7 +147,7 @@ class TokenUpdateManager {
   getStatus() {
     return {
       isRunning: this.isRunning,
-      connectedClients: this.io.sockets.adapter.rooms.get('tokens')?.size || 0,
+      connectedClients: this.tokenClients.size,
       totalTokens: this.tokens.length,
     };
   }

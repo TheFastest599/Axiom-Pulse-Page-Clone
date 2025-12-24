@@ -1,15 +1,15 @@
 /**
- * Axiom Pulse Clone - Express + Socket.IO Backend Server
+ * Axiom Pulse Clone - Express + WebSocket Backend Server
  *
  * Features:
  * 1. REST API for initial token snapshot
- * 2. Socket.IO for real-time token delta updates
- * 3. Socket.IO for market data (BTC/ETH prices)
+ * 2. WebSocket for real-time token delta updates
+ * 3. WebSocket for market data (BTC/ETH prices)
  */
 
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const WebSocket = require('ws');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
@@ -38,12 +38,8 @@ const {
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
+const wssTokens = new WebSocket.Server({ noServer: true });
+const wssMarket = new WebSocket.Server({ noServer: true });
 
 // Middleware
 app.use(cors());
@@ -92,33 +88,35 @@ try {
 }
 
 // Initialize managers and handlers
-const tokenUpdateManager = new TokenUpdateManager(tokens, io);
-const marketUpdateManager = new MarketUpdateManager(marketData, io);
+const tokenUpdateManager = new TokenUpdateManager(tokens, wssTokens);
+const marketUpdateManager = new MarketUpdateManager(marketData, wssMarket);
 
 // Initialize routes with dependencies
 app.use('/api/tokens', initializeTokenRoutes(tokens, tokenUpdateManager));
 app.use('/api/market', initializeMarketRoutes(marketData));
 app.use(
   '/api/health',
-  initializeHealthRoutes(tokenUpdateManager, marketUpdateManager, io)
+  initializeHealthRoutes(tokenUpdateManager, marketUpdateManager)
 );
 
 // ============================================
-// SOCKET.IO CONNECTION HANDLING
+// WEBSOCKET UPGRADE HANDLING
 // ============================================
 
-io.on('connection', socket => {
-  // Route socket to appropriate handler based on namespace or initial message
-  // For now, we'll handle both in the same namespace
+server.on('upgrade', (request, socket, head) => {
+  const pathname = request.url;
 
-  // Check if this is a token client or market client
-  socket.on('join_tokens', () => {
-    initializeTokenSocket(tokenUpdateManager)(socket);
-  });
-
-  socket.on('join_market', () => {
-    initializeMarketSocket(marketData)(socket);
-  });
+  if (pathname === '/tokens') {
+    wssTokens.handleUpgrade(request, socket, head, ws => {
+      initializeTokenSocket(tokenUpdateManager)(ws);
+    });
+  } else if (pathname === '/market') {
+    wssMarket.handleUpgrade(request, socket, head, ws => {
+      initializeMarketSocket(marketData)(marketUpdateManager)(ws);
+    });
+  } else {
+    socket.destroy();
+  }
 });
 
 // ============================================
@@ -143,7 +141,7 @@ server.listen(PORT, () => {
 ║   🚀 Axiom Pulse Server Running             ║
 ╠══════════════════════════════════════════════╣
 ║   HTTP Server:    http://localhost:${PORT}     ║
-║   Socket.IO:      ws://localhost:${PORT}      ║
+║   WebSocket:      ws://localhost:${PORT}      ║
 ╠══════════════════════════════════════════════╣
 ║   REST Endpoints:                           ║
 ║   GET  /api/tokens/snapshot                  ║
@@ -151,9 +149,9 @@ server.listen(PORT, () => {
 ║   GET  /api/market                           ║
 ║   GET  /api/health                           ║
 ╠══════════════════════════════════════════════╣
-║   Socket.IO Events:                         ║
-║   'join_tokens'  → Token updates room       ║
-║   'join_market'  → Market data room         ║
+║   WebSocket Endpoints:                      ║
+║   ws://localhost:${PORT}/tokens  → Token updates ║
+║   ws://localhost:${PORT}/market  → Market data   ║
 ╚══════════════════════════════════════════════╝
   `);
 });

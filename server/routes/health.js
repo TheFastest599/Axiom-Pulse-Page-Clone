@@ -9,15 +9,13 @@ const router = express.Router();
 // Dependencies (will be passed when mounting)
 let tokenUpdateManager;
 let marketUpdateManager;
-let io;
 
 /**
  * Initialize routes with dependencies
  */
-function initializeRoutes(updateManager, marketManager, ioInstance) {
+function initializeRoutes(updateManager, marketManager) {
   tokenUpdateManager = updateManager;
   marketUpdateManager = marketManager;
-  io = ioInstance;
   return router;
 }
 
@@ -34,8 +32,8 @@ router.get('/', (req, res) => {
     status: 'healthy',
     uptime: process.uptime(),
     connections: {
-      tokens: io.sockets.adapter.rooms.get('tokens')?.size || 0,
-      market: io.sockets.adapter.rooms.get('market')?.size || 0,
+      tokens: tokenUpdateStatus.connectedClients,
+      market: marketUpdateStatus.connectedClients,
     },
     tokenUpdates: {
       isRunning: tokenUpdateStatus.isRunning,

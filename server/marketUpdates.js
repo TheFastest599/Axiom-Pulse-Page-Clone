@@ -8,9 +8,10 @@
  * Manages the logic for updating market data and broadcasting changes
  */
 class MarketUpdateManager {
-  constructor(marketData, io) {
+  constructor(marketData, wss) {
     this.marketData = marketData;
-    this.io = io;
+    this.wss = wss;
+    this.marketClients = new Set(); // Clients in market room
     this.updateInterval = null;
     this.isRunning = false;
   }
@@ -34,15 +35,17 @@ class MarketUpdateManager {
   }
 
   /**
-   * Stop the market update cycle
+   * Add a client to the market room
    */
-  stop() {
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-      this.updateInterval = null;
-      this.isRunning = false;
-      console.log('⏹️  Market updates stopped');
-    }
+  addClient(ws) {
+    this.marketClients.add(ws);
+  }
+
+  /**
+   * Remove a client from the market room
+   */
+  removeClient(ws) {
+    this.marketClients.delete(ws);
   }
 
   /**
@@ -50,7 +53,7 @@ class MarketUpdateManager {
    * Updates all market data (BTC/ETH/SOL) at once
    */
   broadcastMarketUpdate() {
-    const clientCount = this.io.sockets.adapter.rooms.get('market')?.size || 0;
+    const clientCount = this.marketClients.size;
     if (clientCount === 0) {
       return; // No clients connected
     }
@@ -76,7 +79,16 @@ class MarketUpdateManager {
     };
 
     // Broadcast to all connected clients in the market room
-    this.io.to('market').emit('market_update', message);
+    const messageStr = JSON.stringify({
+      type: 'market_update',
+      timestamp: new Date().toISOString(),
+      data: this.marketData,
+    });
+    this.marketClients.forEach(ws => {
+      if (ws.readyState === ws.OPEN) {
+        ws.send(messageStr);
+      }
+    });
 
     if (clientCount > 0) {
       console.log(
@@ -99,7 +111,7 @@ class MarketUpdateManager {
   getStatus() {
     return {
       isRunning: this.isRunning,
-      connectedClients: this.io.sockets.adapter.rooms.get('market')?.size || 0,
+      connectedClients: this.marketClients.size,
       marketCoins: Object.keys(this.marketData).length,
     };
   }

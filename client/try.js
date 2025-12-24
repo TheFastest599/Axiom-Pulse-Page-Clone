@@ -1,16 +1,31 @@
-const io = require('socket.io-client');
+const WebSocket = require('ws');
 
-const socket = io('http://localhost:3001');
+// Connect to tokens WebSocket
+const tokenWs = new WebSocket('ws://localhost:3001/tokens');
 
-socket.on('connect', () => {
-  console.log('Connected to server');
-
-  // Join rooms
-  socket.emit('join_tokens');
-  socket.emit('join_market');
+tokenWs.on('open', () => {
+  console.log('Connected to tokens WebSocket');
 });
 
-socket.on('token_update', data => console.log('Token update:', data));
-socket.on('market_update', data => console.log('Market update:', data));
+tokenWs.on('message', data => {
+  const message = JSON.parse(data);
+  console.log('Token update:', message);
+});
 
-socket.on('disconnect', () => console.log('Disconnected'));
+tokenWs.on('close', () => console.log('Disconnected from tokens'));
+tokenWs.on('error', error => console.error('Tokens WS error:', error));
+
+// Connect to market WebSocket
+const marketWs = new WebSocket('ws://localhost:3001/market');
+
+marketWs.on('open', () => {
+  console.log('Connected to market WebSocket');
+});
+
+marketWs.on('message', data => {
+  const message = JSON.parse(data);
+  console.log('Market update:', message);
+});
+
+marketWs.on('close', () => console.log('Disconnected from market'));
+marketWs.on('error', error => console.error('Market WS error:', error));

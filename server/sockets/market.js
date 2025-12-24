@@ -1,8 +1,9 @@
 /**
- * Market Socket Handler
- * Handles Socket.IO connections for market data
+ * Market WebSocket Handler
+ * Handles WebSocket connections for market data
  */
 
+let marketUpdateManager;
 let marketData;
 
 /**
@@ -10,30 +11,39 @@ let marketData;
  */
 function initializeHandler(marketDataRef) {
   marketData = marketDataRef;
-  return handleConnection;
+  return function (updateManager) {
+    marketUpdateManager = updateManager;
+    return handleConnection;
+  };
 }
 
 /**
- * Handle market socket connections
+ * Handle market WebSocket connections
  */
-function handleConnection(socket) {
+function handleConnection(ws) {
   console.log('🔌 New client connected to market data');
 
-  // Join the market room
-  socket.join('market');
+  // Add to market room
+  marketUpdateManager.addClient(ws);
 
   // Send initial market data
-  socket.emit('market_snapshot', {
-    timestamp: new Date().toISOString(),
-    data: marketData,
-  });
+  ws.send(
+    JSON.stringify({
+      type: 'market_snapshot',
+      timestamp: new Date().toISOString(),
+      data: marketData,
+    })
+  );
 
-  socket.on('disconnect', () => {
+  // Handle client disconnect
+  ws.on('close', () => {
+    marketUpdateManager.removeClient(ws);
     console.log('🔌 Client disconnected from market data');
   });
 
-  socket.on('error', error => {
-    console.error('❌ Socket.IO error (market):', error);
+  ws.on('error', error => {
+    console.error('❌ WebSocket error (market):', error);
+    marketUpdateManager.removeClient(ws);
   });
 }
 
