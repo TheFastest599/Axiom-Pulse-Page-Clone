@@ -15,7 +15,7 @@ interface TokenColumnProps {
   title: string;
 }
 
-const ESTIMATED_ITEM_HEIGHT = 165; // Approximate height of TokenCard
+const ESTIMATED_ITEM_HEIGHT = 118; // Approximate height of TokenCard
 
 export const TokenColumn = ({ room, title }: TokenColumnProps) => {
   const tokens = useAppSelector(state => state.data.tokens[room]);
@@ -81,10 +81,7 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
           No tokens in this room
         </div>
       ) : (
-        <div
-          ref={parentRef}
-          className="flex-1 overflow-y-auto p-2 scrollbar-thin"
-        >
+        <div ref={parentRef} className="flex-1 overflow-y-auto  scrollbar-thin">
           <div
             style={{
               height: `${virtualizer.getTotalSize()}px`,
@@ -104,7 +101,7 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
                     width: '100%',
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
-                  className="pb-2"
+                  //   className="pb-2"
                 >
                   <TokenCard
                     token={item.token}
