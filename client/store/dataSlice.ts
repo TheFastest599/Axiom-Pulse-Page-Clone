@@ -125,6 +125,7 @@ const dataSlice = createSlice({
 
     // Update a single token (from WebSocket delta update)
     // Only metrics, distribution, and security fields are dynamic
+    // Also handles room transitions
     updateToken: (
       state,
       action: PayloadAction<{
@@ -132,6 +133,8 @@ const dataSlice = createSlice({
         content: {
           id: string;
           delta: {
+            room?: 'new_pairs' | 'final_stretch' | 'migrated';
+            roomEnteredAt?: string;
             metrics?: Partial<Token['metrics']>;
             distribution?: Partial<Token['distribution']>;
             security?: Partial<Token['security']>;
@@ -141,27 +144,71 @@ const dataSlice = createSlice({
     ) => {
       const { room, content } = action.payload;
       const { id, delta } = content;
-      const token = state.tokens[room][id];
 
-      if (token) {
-        // Merge only the dynamic fields
-        if (delta.metrics) {
-          state.tokens[room][id].metrics = {
-            ...token.metrics,
-            ...delta.metrics,
-          };
+      // Check if token is transitioning to a new room
+      const newRoom = delta.room;
+      const currentRoom = room;
+
+      if (newRoom && newRoom !== currentRoom) {
+        // Room transition detected - move token to new room
+        const token = state.tokens[currentRoom][id];
+
+        if (token) {
+          // Create updated token with new data
+          const updatedToken = { ...token };
+
+          // Apply delta updates
+          if (delta.metrics) {
+            updatedToken.metrics = {
+              ...token.metrics,
+              ...delta.metrics,
+            };
+          }
+          if (delta.distribution) {
+            updatedToken.distribution = {
+              ...token.distribution,
+              ...delta.distribution,
+            };
+          }
+          if (delta.security) {
+            updatedToken.security = {
+              ...token.security,
+              ...delta.security,
+            };
+          }
+
+          // Move token to new room
+          state.tokens[newRoom][id] = updatedToken;
+
+          // Remove from old room
+          delete state.tokens[currentRoom][id];
+
+          console.log(`🔄 Token ${id} moved: ${currentRoom} → ${newRoom}`);
         }
-        if (delta.distribution) {
-          state.tokens[room][id].distribution = {
-            ...token.distribution,
-            ...delta.distribution,
-          };
-        }
-        if (delta.security) {
-          state.tokens[room][id].security = {
-            ...token.security,
-            ...delta.security,
-          };
+      } else {
+        // Normal update - no room change
+        const token = state.tokens[room][id];
+
+        if (token) {
+          // Merge only the dynamic fields
+          if (delta.metrics) {
+            state.tokens[room][id].metrics = {
+              ...token.metrics,
+              ...delta.metrics,
+            };
+          }
+          if (delta.distribution) {
+            state.tokens[room][id].distribution = {
+              ...token.distribution,
+              ...delta.distribution,
+            };
+          }
+          if (delta.security) {
+            state.tokens[room][id].security = {
+              ...token.security,
+              ...delta.security,
+            };
+          }
         }
       }
 

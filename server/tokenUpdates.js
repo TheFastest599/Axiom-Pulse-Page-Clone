@@ -93,6 +93,9 @@ class TokenUpdateManager {
     const randomIndex = Math.floor(Math.random() * this.tokens.length);
     const token = this.tokens[randomIndex];
 
+    // Capture the OLD room BEFORE generating delta
+    const oldRoom = this.getTokenRoom(token);
+
     // Generate delta update for this token
     const delta = generateDeltaUpdate(token);
 
@@ -103,27 +106,21 @@ class TokenUpdateManager {
     // Update the token in memory
     token.updateDynamicFields(delta);
 
-    // Determine the room based on token status
-    const room = this.getTokenRoom(token);
+    // Determine the NEW room after update (in case of transition)
+    const newRoom = this.getTokenRoom(token);
 
-    // Prepare the update message
-    const message = {
-      room: room,
-      timestamp: new Date().toISOString(),
-      content: {
-        id: token.id,
-        delta: delta,
-      },
-    };
+    // If room changed, the delta already contains delta.room
+    // Use oldRoom for the message.room so client knows where to find the token
+    const messageRoom = delta.room ? oldRoom : newRoom;
 
     // Broadcast to all connected clients in the tokens room
     const messageStr = JSON.stringify({
       type: 'token_update',
-      room: room,
+      room: messageRoom, // Old room (where token currently is on client)
       timestamp: new Date().toISOString(),
       content: {
         id: token.id,
-        delta: delta,
+        delta: delta, // Contains delta.room if transitioning
       },
     });
     this.tokenClients.forEach(ws => {
@@ -134,8 +131,11 @@ class TokenUpdateManager {
 
     if (clientCount > 0) {
       if (process.env.DEV === 'true') {
+        const roomInfo = delta.room
+          ? `${messageRoom} → ${delta.room}`
+          : newRoom;
         console.log(
-          `📡 [${room}] Broadcasted 1 token update: ${token.name} (${token.ticker}) to ${clientCount} clients`
+          `📡 [${roomInfo}] Broadcasted 1 token update: ${token.name} (${token.ticker}) to ${clientCount} clients`
         );
       }
     }

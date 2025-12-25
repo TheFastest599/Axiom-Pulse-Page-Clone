@@ -67,6 +67,7 @@ function generateToken(index, room = null) {
     created_at: createdAt.toISOString(),
     protocol: protocol,
     room: roomName, // Store the fixed room assignment
+    roomEnteredAt: now.toISOString(), // Track when token entered this room
     influence: {
       kols_count: Math.floor(Math.random() * 10),
       kol_allocation_pct: Math.floor(Math.random() * 20),
@@ -149,14 +150,94 @@ function generateDynamicData(room = null) {
 
 /**
  * Generate a delta update for a token (only dynamic fields change)
+ * Implements full lifecycle: new_pairs → final_stretch → migrated → new_pairs
  */
 function generateDeltaUpdate(token) {
   const delta = {};
+  const now = new Date();
+  const roomEnteredAt = new Date(token.roomEnteredAt || token.created_at);
+  const timeInRoomMs = now - roomEnteredAt;
+  const timeInRoomMinutes = timeInRoomMs / (1000 * 60);
 
-  // Randomly update metrics
-  if (Math.random() > 0.3) {
+  // Check for room transitions based on lifecycle
+  let shouldTransition = false;
+  let newRoom = token.room;
+
+  // Lifecycle logic
+  if (token.room === 'new_pairs') {
+    // Transition to final_stretch when bonding_progress reaches 60%
+    if (token.metrics.bonding_progress >= 60) {
+      newRoom = 'final_stretch';
+      shouldTransition = true;
+    }
+  } else if (token.room === 'final_stretch') {
+    // Transition to migrated when bonding_progress reaches 100%
+    if (token.metrics.bonding_progress >= 100) {
+      newRoom = 'migrated';
+      shouldTransition = true;
+      delta.distribution = delta.distribution || {};
+      delta.distribution.dev_status = {
+        is_migrated: true,
+        dev_created_count: token.distribution.dev_status.dev_created_count,
+        dev_hold_percent: token.distribution.dev_status.dev_hold_percent,
+      };
+    }
+  } else if (token.room === 'migrated') {
+    // After 2.5 minutes in migrated, reset back to new_pairs
+    if (timeInRoomMinutes >= 1.7) {
+      newRoom = 'new_pairs';
+      shouldTransition = true;
+
+      // Reset token to new state
+      delta.metrics = {
+        market_cap: Math.floor(Math.random() * 500000) + 10000,
+        volume_24h: Math.floor(Math.random() * 100000) + 1000,
+        price_sol: parseFloat((Math.random() * 0.1).toFixed(6)),
+        transactions: Math.floor(Math.random() * 1000) + 100,
+        global_fees_paid: Math.floor(Math.random() * 500),
+        bonding_progress: parseFloat((Math.random() * 25 + 25).toFixed(2)), // Start 25-50% for faster progression
+        price_change_dir: Math.random() > 0.5 ? 'up' : 'down',
+      };
+
+      delta.distribution = {
+        holders: Math.floor(Math.random() * 500) + 50,
+        pro_traders: Math.floor(Math.random() * 50),
+        dev_status: {
+          is_migrated: false,
+          dev_created_count: Math.floor(Math.random() * 50),
+          dev_hold_percent: parseFloat((Math.random() * 10).toFixed(2)),
+        },
+        bundle_holding: parseFloat((Math.random() * 20).toFixed(2)),
+        snipers_holding: parseFloat((Math.random() * 25).toFixed(2)),
+        insiders_holding: parseFloat((Math.random() * 15).toFixed(2)),
+      };
+
+      delta.security = {
+        lp_burned: Math.floor(Math.random() * 101),
+        is_honeypot: Math.random() > 0.9,
+        top_10_holders_pct: parseFloat((Math.random() * 30 + 10).toFixed(2)),
+      };
+    }
+  }
+
+  // Apply room transition
+  if (shouldTransition) {
+    delta.room = newRoom;
+    delta.roomEnteredAt = now.toISOString();
+  }
+
+  // Randomly update metrics (if not resetting)
+  if (Math.random() > 0.3 && !shouldTransition) {
     const priceChange = (Math.random() - 0.5) * 0.1; // ±10% change
     const volumeChange = (Math.random() - 0.4) * 0.2; // -40% to +60% change
+
+    // Bonding progress increase rate depends on room
+    let bondingIncrease = 0;
+    if (token.room === 'new_pairs') {
+      bondingIncrease = Math.random() * 3.5; // 0-3.5% per update (faster progression)
+    } else if (token.room === 'final_stretch') {
+      bondingIncrease = Math.random() * 1.8; // 0-1.8% per update (moderate)
+    }
 
     delta.metrics = {
       market_cap: Math.max(
@@ -177,7 +258,9 @@ function generateDeltaUpdate(token) {
         token.metrics.global_fees_paid + Math.floor(Math.random() * 5),
       bonding_progress: Math.min(
         100,
-        token.metrics.bonding_progress + Math.random() * 2
+        parseFloat(
+          (token.metrics.bonding_progress + bondingIncrease).toFixed(2)
+        )
       ),
       price_change_dir: priceChange > 0 ? 'up' : 'down',
     };

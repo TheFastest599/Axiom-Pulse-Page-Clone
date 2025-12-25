@@ -15,7 +15,7 @@ interface TokenColumnProps {
   title: string;
 }
 
-const ESTIMATED_ITEM_HEIGHT = 160; // Approximate height of TokenCard including gap
+const ESTIMATED_ITEM_HEIGHT = 165; // Approximate height of TokenCard
 
 export const TokenColumn = ({ room, title }: TokenColumnProps) => {
   const tokens = useAppSelector(state => state.data.tokens[room]);
@@ -60,15 +60,12 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
 
   const count = sortedTokens.length;
 
-  // Virtual list configuration with dynamic measurement
+  // Virtual list configuration - simple version without measureElement
   const virtualizer = useVirtualizer({
     count: sortedTokens.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ESTIMATED_ITEM_HEIGHT,
     overscan: 5,
-    measureElement: element => {
-      return element.getBoundingClientRect().height + 4;
-    },
   });
 
   const virtualItems = virtualizer.getVirtualItems();
@@ -100,16 +97,14 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
               return (
                 <div
                   key={item.token.id}
-                  data-index={virtualItem.index}
-                  ref={virtualizer.measureElement}
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
                     transform: `translateY(${virtualItem.start}px)`,
-                    paddingBottom: '8px',
                   }}
+                  className="pb-2"
                 >
                   <TokenCard
                     token={item.token}

@@ -200,9 +200,11 @@ const tokenHistorySlice = createSlice({
       action: PayloadAction<{
         tokenId: string;
         createdAt: string;
+        room?: string; // Track room for lifecycle resets
         metrics?: {
           transactions?: number;
           volume_24h?: number;
+          bonding_progress?: number;
         };
         distribution?: {
           holders?: number;
@@ -212,11 +214,20 @@ const tokenHistorySlice = createSlice({
         sell?: number;
       }>
     ) => {
-      const { tokenId, createdAt, metrics, distribution, buy, sell } =
+      const { tokenId, createdAt, room, metrics, distribution, buy, sell } =
         action.payload;
 
       const history = state.history[tokenId];
-      if (!history) {
+
+      // Detect lifecycle reset: token cycled back to new_pairs with fresh data
+      const shouldReset =
+        history &&
+        room === 'new_pairs' &&
+        metrics?.bonding_progress !== undefined &&
+        metrics.bonding_progress < 50 && // Low bonding progress indicates fresh start
+        history.current.tx > (metrics?.transactions ?? 0) * 1.5; // Significant metric drop
+
+      if (!history || shouldReset) {
         // Initialize if doesn't exist
         const snapshot: TokenSnapshot = {
           buy: buy ?? Math.floor((metrics?.transactions ?? 0) / 2),

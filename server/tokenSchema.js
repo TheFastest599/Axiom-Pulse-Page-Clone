@@ -19,6 +19,7 @@ class TokenSchema {
     this.protocol = data.protocol;
     this.influence = data.influence;
     this.room = data.room; // Fixed room assignment: 'new_pairs', 'final_stretch', or 'migrated'
+    this.roomEnteredAt = data.roomEnteredAt || data.created_at; // Track when token entered current room
 
     // --- DYNAMIC FIELDS (Updated via WebSocket) ---
     this.metrics = data.metrics || {};
@@ -50,6 +51,13 @@ class TokenSchema {
     if (delta.security) {
       this.security = { ...this.security, ...delta.security };
     }
+    // Support room transitions
+    if (delta.room) {
+      this.room = delta.room;
+    }
+    if (delta.roomEnteredAt) {
+      this.roomEnteredAt = delta.roomEnteredAt;
+    }
   }
 
   /**
@@ -65,6 +73,7 @@ class TokenSchema {
       protocol: this.protocol,
       influence: this.influence,
       room: this.room,
+      roomEnteredAt: this.roomEnteredAt,
       metrics: this.metrics,
       distribution: this.distribution,
       security: this.security,

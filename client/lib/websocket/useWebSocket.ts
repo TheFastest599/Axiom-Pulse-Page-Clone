@@ -15,6 +15,8 @@ interface TokenUpdateMessage {
   content: {
     id: string;
     delta: {
+      room?: 'new_pairs' | 'final_stretch' | 'migrated';
+      roomEnteredAt?: string;
       metrics?: any;
       distribution?: any;
       security?: any;
@@ -96,7 +98,7 @@ export const useWebSocket = (enabled: boolean = true) => {
               );
 
               // Update token history for scoring
-              // Find the token to get created_at
+              // Find the token - check all rooms since it might have just transitioned
               const currentTokens = tokensRef.current;
               const token =
                 currentTokens.new_pairs[message.content.id] ||
@@ -104,11 +106,19 @@ export const useWebSocket = (enabled: boolean = true) => {
                 currentTokens.migrated[message.content.id];
 
               if (token) {
+                // Determine the actual room after transition
+                const actualRoom = message.content.delta.room || message.room;
+
                 dispatch(
                   updateTokenHistory({
                     tokenId: message.content.id,
                     createdAt: token.created_at,
-                    metrics: message.content.delta.metrics,
+                    room: actualRoom, // Use new room if transitioned
+                    metrics: {
+                      ...message.content.delta.metrics,
+                      bonding_progress:
+                        message.content.delta.metrics?.bonding_progress,
+                    },
                     distribution: message.content.delta.distribution,
                   })
                 );
