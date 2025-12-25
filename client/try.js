@@ -1,31 +1,22 @@
 const WebSocket = require('ws');
 
-// Connect to tokens WebSocket
-const tokenWs = new WebSocket('ws://localhost:3001/tokens');
+// Connect to the combined WebSocket
+const ws = new WebSocket('ws://localhost:3001/ws');
 
-tokenWs.on('open', () => {
-  console.log('Connected to tokens WebSocket');
+ws.on('open', () => {
+  console.log('Connected to WebSocket');
 });
 
-tokenWs.on('message', data => {
+ws.on('message', data => {
   const message = JSON.parse(data);
-  console.log('Token update:', message);
+  if (message.type === 'token_update') {
+    console.log('Token update:', message);
+  } else if (message.type === 'market_update') {
+    console.log('Market update:', message);
+  } else {
+    console.log('Other message:', message);
+  }
 });
 
-tokenWs.on('close', () => console.log('Disconnected from tokens'));
-tokenWs.on('error', error => console.error('Tokens WS error:', error));
-
-// Connect to market WebSocket
-const marketWs = new WebSocket('ws://localhost:3001/market');
-
-marketWs.on('open', () => {
-  console.log('Connected to market WebSocket');
-});
-
-marketWs.on('message', data => {
-  const message = JSON.parse(data);
-  console.log('Market update:', message);
-});
-
-marketWs.on('close', () => console.log('Disconnected from market'));
-marketWs.on('error', error => console.error('Market WS error:', error));
+ws.on('close', () => console.log('Disconnected'));
+ws.on('error', error => console.error('Error:', error));

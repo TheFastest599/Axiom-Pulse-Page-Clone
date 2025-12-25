@@ -38,8 +38,7 @@ const {
 
 const app = express();
 const server = http.createServer(app);
-const wssTokens = new WebSocket.Server({ noServer: true });
-const wssMarket = new WebSocket.Server({ noServer: true });
+const wss = new WebSocket.Server({ noServer: true });
 
 // Middleware
 app.use(cors());
@@ -88,8 +87,8 @@ try {
 }
 
 // Initialize managers and handlers
-const tokenUpdateManager = new TokenUpdateManager(tokens, wssTokens);
-const marketUpdateManager = new MarketUpdateManager(marketData, wssMarket);
+const tokenUpdateManager = new TokenUpdateManager(tokens, wss);
+const marketUpdateManager = new MarketUpdateManager(marketData, wss);
 
 // Initialize routes with dependencies
 app.use('/api/tokens', initializeTokenRoutes(tokens, tokenUpdateManager));
@@ -106,12 +105,10 @@ app.use(
 server.on('upgrade', (request, socket, head) => {
   const pathname = request.url;
 
-  if (pathname === '/tokens') {
-    wssTokens.handleUpgrade(request, socket, head, ws => {
+  if (pathname === '/ws') {
+    wss.handleUpgrade(request, socket, head, ws => {
+      // Add to both token and market clients
       initializeTokenSocket(tokenUpdateManager)(ws);
-    });
-  } else if (pathname === '/market') {
-    wssMarket.handleUpgrade(request, socket, head, ws => {
       initializeMarketSocket(marketData)(marketUpdateManager)(ws);
     });
   } else {
@@ -149,9 +146,8 @@ server.listen(PORT, () => {
 ║   GET  /api/market                           ║
 ║   GET  /api/health                           ║
 ╠══════════════════════════════════════════════╣
-║   WebSocket Endpoints:                      ║
-║   ws://localhost:${PORT}/tokens  → Token updates ║
-║   ws://localhost:${PORT}/market  → Market data   ║
+║   WebSocket Endpoint:                       ║
+║   ws://localhost:${PORT}/ws  → All updates     ║
 ╚══════════════════════════════════════════════╝
   `);
 });

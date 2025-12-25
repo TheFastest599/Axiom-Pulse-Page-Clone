@@ -91,9 +91,11 @@ class MarketUpdateManager {
     });
 
     if (clientCount > 0) {
-      console.log(
-        `📊 Broadcasted market data update to ${clientCount} clients`
-      );
+      if (process.env.DEV === 'true') {
+        console.log(
+          `📊 Broadcasted market data update to ${clientCount} clients`
+        );
+      }
     }
   }
 

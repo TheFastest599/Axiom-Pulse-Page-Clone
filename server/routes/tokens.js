@@ -29,20 +29,25 @@ router.get('/snapshot', (req, res) => {
 
   // Group tokens by room
   const groupedTokens = {
-    new_pairs: { count: 0, tokens: [] },
-    final_stretch: { count: 0, tokens: [] },
-    migrated: { count: 0, tokens: [] },
+    new_pairs: { count: 0, tokens: {} },
+    final_stretch: { count: 0, tokens: {} },
+    migrated: { count: 0, tokens: {} },
   };
 
   tokens.forEach(token => {
     const room = tokenUpdateManager.getTokenRoom(token);
-    groupedTokens[room].tokens.push(token.toJSON());
+    groupedTokens[room].tokens[token.id] = token.toJSON();
     groupedTokens[room].count++;
   });
 
-  // Randomize the order of tokens within each room
+  // Randomize the order of tokens within each room (convert to array, shuffle, back to object)
   Object.keys(groupedTokens).forEach(room => {
-    groupedTokens[room].tokens.sort(() => Math.random() - 0.5);
+    const tokenArray = Object.values(groupedTokens[room].tokens);
+    tokenArray.sort(() => Math.random() - 0.5);
+    groupedTokens[room].tokens = {};
+    tokenArray.forEach(token => {
+      groupedTokens[room].tokens[token.id] = token;
+    });
   });
 
   res.json({

@@ -127,9 +127,11 @@ class TokenUpdateManager {
     });
 
     if (clientCount > 0) {
-      console.log(
-        `📡 [${room}] Broadcasted 1 token update: ${token.name} (${token.ticker}) to ${clientCount} clients`
-      );
+      if (process.env.DEV === 'true') {
+        console.log(
+          `📡 [${room}] Broadcasted 1 token update: ${token.name} (${token.ticker}) to ${clientCount} clients`
+        );
+      }
     }
   }
 
