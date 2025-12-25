@@ -18,6 +18,7 @@ class TokenSchema {
     this.created_at = data.created_at;
     this.protocol = data.protocol;
     this.influence = data.influence;
+    this.room = data.room; // Fixed room assignment: 'new_pairs', 'final_stretch', or 'migrated'
 
     // --- DYNAMIC FIELDS (Updated via WebSocket) ---
     this.metrics = data.metrics || {};
@@ -63,6 +64,7 @@ class TokenSchema {
       created_at: this.created_at,
       protocol: this.protocol,
       influence: this.influence,
+      room: this.room,
       metrics: this.metrics,
       distribution: this.distribution,
       security: this.security,

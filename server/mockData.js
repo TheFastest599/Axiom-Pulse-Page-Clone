@@ -24,10 +24,21 @@ const tokenNames = [
 ];
 
 const protocols = [
-  { id: 'pump_v1', label: 'Pump' },
-  { id: 'raydium_v2', label: 'Raydium' },
-  { id: 'orca_v1', label: 'Orca' },
-  { id: 'jupiter_v3', label: 'Jupiter' },
+  { id: 'pump', label: 'Pump' },
+  { id: 'mayhem', label: 'Mayhem' },
+  { id: 'bonk', label: 'Bonk' },
+  { id: 'bags', label: 'Bags' },
+  { id: 'moonshot', label: 'Moonshot' },
+  { id: 'heaven', label: 'Heaven' },
+  { id: 'daos_fun', label: 'Daos.fun' },
+  { id: 'candle', label: 'Candle' },
+  { id: 'sugar', label: 'Sugar' },
+  { id: 'believe', label: 'Believe' },
+  { id: 'jupiter_studio', label: 'Jupiter Studio' },
+  { id: 'moonit', label: 'Moonit' },
+  { id: 'boop', label: 'Boop' },
+  { id: 'launchlab', label: 'LaunchLab' },
+  { id: 'dynamic_bc', label: 'Dynamic BC' },
 ];
 
 /**
@@ -41,6 +52,9 @@ function generateToken(index, room = null) {
     now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000
   ); // Random time in last 7 days
 
+  // Determine room name from room config
+  const roomName = room?.name || 'new_pairs';
+
   const staticData = {
     id: `${generateRandomId()}pump`,
     name: `${tokenInfo.name}${
@@ -52,6 +66,7 @@ function generateToken(index, room = null) {
     image_url: `https://api.dicebear.com/7.x/identicon/svg?seed=${tokenInfo.ticker}${index}`,
     created_at: createdAt.toISOString(),
     protocol: protocol,
+    room: roomName, // Store the fixed room assignment
     influence: {
       kols_count: Math.floor(Math.random() * 10),
       kol_allocation_pct: Math.floor(Math.random() * 20),

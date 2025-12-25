@@ -51,11 +51,17 @@ class TokenUpdateManager {
   }
 
   /**
-   * Get the room/category for a token based on its status
+   * Get the room/category for a token based on its stored room assignment
    * @param {TokenSchema} token - The token to categorize
    * @returns {string} - The room name: 'new_pairs', 'final_stretch', or 'migrated'
    */
   getTokenRoom(token) {
+    // Use the stored room assignment (fixed at token creation)
+    if (token.room) {
+      return token.room;
+    }
+
+    // Fallback for legacy tokens without room field
     const bondingProgress = token.metrics.bonding_progress;
     const isMigrated = token.distribution.dev_status.is_migrated;
 

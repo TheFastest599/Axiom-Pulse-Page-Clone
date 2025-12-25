@@ -14,6 +14,159 @@ import {
 } from 'lucide-react';
 import { TokenScore } from '@/store/tokenHistorySlice';
 
+// Protocol configuration with icons and colors
+interface ProtocolConfig {
+  icon: string;
+  color: string; // Text/icon color
+  bgColor: string; // Background color
+  borderColor: string; // Border color
+}
+
+const PROTOCOL_CONFIG: Record<string, ProtocolConfig> = {
+  pump: {
+    icon: '/protocols/pump.svg',
+    color: 'text-green-400',
+    bgColor: 'bg-green-500/10',
+    borderColor: 'border-green-500/30',
+  },
+  mayhem: {
+    icon: '/protocols/mayhem.svg',
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-500/10',
+    borderColor: 'border-orange-500/30',
+  },
+  bonk: {
+    icon: '/protocols/bonk.svg',
+    color: 'text-orange-300',
+    bgColor: 'bg-orange-400/10',
+    borderColor: 'border-orange-400/30',
+  },
+  bags: {
+    icon: '/protocols/bags.svg',
+    color: 'text-green-400',
+    bgColor: 'bg-green-500/10',
+    borderColor: 'border-green-500/30',
+  },
+  moonshot: {
+    icon: '/protocols/moonshot-new.svg',
+    color: 'text-cyan-400',
+    bgColor: 'bg-cyan-500/10',
+    borderColor: 'border-cyan-500/30',
+  },
+  heaven: {
+    icon: '/protocols/heaven.svg',
+    color: 'text-gray-400',
+    bgColor: 'bg-gray-500/10',
+    borderColor: 'border-gray-500/30',
+  },
+  daos_fun: {
+    icon: '/protocols/daosfun.svg',
+    color: 'text-pink-400',
+    bgColor: 'bg-pink-500/10',
+    borderColor: 'border-pink-500/30',
+  },
+  candle: {
+    icon: '/protocols/candle.svg',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-500/10',
+    borderColor: 'border-orange-500/30',
+  },
+  sugar: {
+    icon: '/protocols/sugar.svg',
+    color: 'text-pink-300',
+    bgColor: 'bg-pink-400/10',
+    borderColor: 'border-pink-400/30',
+  },
+  believe: {
+    icon: '/protocols/launch-a-coin.svg',
+    color: 'text-green-400',
+    bgColor: 'bg-green-500/10',
+    borderColor: 'border-green-500/30',
+  },
+  jupiter_studio: {
+    icon: '/protocols/jupstudio.svg',
+    color: 'text-cyan-400',
+    bgColor: 'bg-cyan-500/10',
+    borderColor: 'border-cyan-500/30',
+  },
+  moonit: {
+    icon: '/protocols/moonit.svg',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/10',
+    borderColor: 'border-purple-500/30',
+  },
+  boop: {
+    icon: '/protocols/boop.svg',
+    color: 'text-teal-400',
+    bgColor: 'bg-teal-500/10',
+    borderColor: 'border-teal-500/30',
+  },
+  launchlab: {
+    icon: '/protocols/launchlab.svg',
+    color: 'text-gray-400',
+    bgColor: 'bg-gray-500/10',
+    borderColor: 'border-gray-500/30',
+  },
+  dynamic_bc: {
+    icon: '/protocols/virtual-curve.svg',
+    color: 'text-pink-500',
+    bgColor: 'bg-pink-500/10',
+    borderColor: 'border-pink-500/30',
+  },
+  // Legacy support
+  pump_v1: {
+    icon: '/protocols/pump.svg',
+    color: 'text-green-400',
+    bgColor: 'bg-green-500/10',
+    borderColor: 'border-green-500/30',
+  },
+};
+
+// Protocol badge component with icon and colored styling
+const ProtocolIcon = ({
+  protocolId,
+  label,
+}: {
+  protocolId: string;
+  label: string;
+}) => {
+  const config =
+    PROTOCOL_CONFIG[protocolId] ||
+    PROTOCOL_CONFIG[label.toLowerCase().replace(/[.\s]/g, '_')];
+
+  if (config) {
+    return (
+      <div
+        className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ${config.bgColor} border ${config.borderColor}`}
+        title={label}
+      >
+        <img
+          src={config.icon}
+          alt={label}
+          className="w-3 h-3"
+          onError={e => {
+            // Hide image on error
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <span className={`text-[9px] font-medium ${config.color}`}>
+          {label}
+        </span>
+      </div>
+    );
+  }
+
+  // Fallback to simple text badge if no config found
+  return (
+    <Badge
+      variant="outline"
+      className="text-[9px] px-1.5 py-0.5 h-auto border-gray-700 text-gray-500"
+    >
+      {label}
+    </Badge>
+  );
+};
+
 interface Token {
   id: string;
   name: string;
@@ -179,7 +332,7 @@ const TokenCardComponent = ({
 
         {/* Token Info */}
         <div className="flex-1 min-w-0">
-          {/* Row 1: Name, Ticker, Time */}
+          {/* Row 1: Name, Ticker, Protocol Icon */}
           <div className="flex items-center gap-2 mb-1">
             <span className="font-semibold text-white truncate">
               {token.name}
@@ -187,12 +340,10 @@ const TokenCardComponent = ({
             <span className="text-gray-500 text-sm truncate">
               {token.ticker}
             </span>
-            <Badge
-              variant="outline"
-              className="text-[10px] px-1 py-0 h-4 border-gray-700 text-gray-500"
-            >
-              {token.protocol.label}
-            </Badge>
+            <ProtocolIcon
+              protocolId={token.protocol.id}
+              label={token.protocol.label}
+            />
             <ScoreIndicator />
           </div>
 
