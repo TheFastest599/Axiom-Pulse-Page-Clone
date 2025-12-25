@@ -9,6 +9,7 @@ import {
   setLoading,
   setError,
 } from '@/store/dataSlice';
+import { initializeAllHistory } from '@/store/tokenHistorySlice';
 import { fetchTokensSnapshot, fetchMarketData } from '@/lib/api/queries';
 import { useWebSocket } from '@/lib/websocket/useWebSocket';
 
@@ -35,6 +36,29 @@ export const useInitializeData = () => {
   useEffect(() => {
     if (tokensQuery.data) {
       dispatch(setTokenSnapshot({ rooms: tokensQuery.data.rooms }));
+
+      // Initialize token history for scoring
+      const allTokens = [
+        ...Object.values(tokensQuery.data.rooms.new_pairs.tokens || {}),
+        ...Object.values(tokensQuery.data.rooms.final_stretch.tokens || {}),
+        ...Object.values(tokensQuery.data.rooms.migrated.tokens || {}),
+      ];
+
+      dispatch(
+        initializeAllHistory({
+          tokens: allTokens.map((token: any) => ({
+            id: token.id,
+            created_at: token.created_at,
+            metrics: {
+              transactions: token.metrics?.transactions || 0,
+              volume_24h: token.metrics?.volume_24h || 0,
+            },
+            distribution: {
+              holders: token.distribution?.holders || 0,
+            },
+          })),
+        })
+      );
     }
   }, [tokensQuery.data, dispatch]);
 

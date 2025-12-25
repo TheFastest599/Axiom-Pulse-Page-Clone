@@ -3,7 +3,16 @@
 import { memo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Twitter, Send, Search } from 'lucide-react';
+import {
+  Globe,
+  Twitter,
+  Send,
+  Search,
+  TrendingUp,
+  TrendingDown,
+  Zap,
+} from 'lucide-react';
+import { TokenScore } from '@/store/tokenHistorySlice';
 
 interface Token {
   id: string;
@@ -54,6 +63,10 @@ interface Token {
 
 interface TokenCardProps {
   token: Token;
+  score?: TokenScore | null;
+  rank?: number;
+  isTopPriority?: boolean;
+  isDeprioritized?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -80,15 +93,66 @@ const formatCurrency = (value: number): string => {
   return `$${value.toFixed(0)}`;
 };
 
-const TokenCardComponent = ({ token, style }: TokenCardProps) => {
+const TokenCardComponent = ({
+  token,
+  score,
+  rank,
+  isTopPriority,
+  isDeprioritized,
+  style,
+}: TokenCardProps) => {
   const timeAgo = formatRelativeTime(token.created_at);
   const { social_links } = token.influence;
 
+  // Dynamic styling based on priority
+  const cardClasses = `
+    bg-[#111113] border transition-all cursor-pointer p-3
+
+  `;
+
+  // Score indicator component
+  const ScoreIndicator = () => {
+    if (!score) return null;
+
+    const totalScore = score.score;
+    const momentum = score.hasMomentumIncreasing && score.hasVolumeExpansion;
+
+    return (
+      <div className="flex items-center gap-1">
+        {/* Rank badge for top 5 */}
+        {isTopPriority && rank !== undefined && (
+          <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px] px-1 h-4">
+            #{rank}
+          </Badge>
+        )}
+
+        {/* Score badge */}
+        <Badge
+          variant="outline"
+          className={`text-[9px] px-1 h-4 ${
+            totalScore >= 5
+              ? 'border-green-500/50 text-green-400'
+              : totalScore <= 2
+              ? 'border-red-500/50 text-red-400'
+              : 'border-gray-600 text-gray-400'
+          }`}
+        >
+          <Zap className="w-2 h-2 mr-0.5" />
+          {totalScore}
+        </Badge>
+
+        {/* Momentum indicator */}
+        {momentum ? (
+          <TrendingUp className="w-3 h-3 text-green-400" />
+        ) : score.hasSellPressure ? (
+          <TrendingDown className="w-3 h-3 text-red-400" />
+        ) : null}
+      </div>
+    );
+  };
+
   return (
-    <Card
-      style={style}
-      className="bg-[#111113] border-gray-800 hover:border-gray-700 transition-colors cursor-pointer p-3"
-    >
+    <Card style={style} className={cardClasses}>
       <div className="flex gap-3">
         {/* Token Image */}
         <div className="relative flex-shrink-0">
@@ -107,6 +171,10 @@ const TokenCardComponent = ({ token, style }: TokenCardProps) => {
                 : 'bg-red-500'
             }`}
           />
+          {/* Top priority glow indicator */}
+          {isTopPriority && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          )}
         </div>
 
         {/* Token Info */}
@@ -125,6 +193,7 @@ const TokenCardComponent = ({ token, style }: TokenCardProps) => {
             >
               {token.protocol.label}
             </Badge>
+            <ScoreIndicator />
           </div>
 
           {/* Row 2: Time + Social Icons */}
@@ -213,10 +282,24 @@ const TokenCardComponent = ({ token, style }: TokenCardProps) => {
   );
 };
 
-// Memoized TokenCard - only re-renders when token data changes
+// Memoized TokenCard - only re-renders when token data or priority status changes
 export const TokenCard = memo(TokenCardComponent, (prevProps, nextProps) => {
   const prev = prevProps.token;
   const next = nextProps.token;
+
+  // Compare priority status first (quick check)
+  if (
+    prevProps.isTopPriority !== nextProps.isTopPriority ||
+    prevProps.isDeprioritized !== nextProps.isDeprioritized ||
+    prevProps.rank !== nextProps.rank
+  ) {
+    return false;
+  }
+
+  // Compare score
+  if (prevProps.score?.score !== nextProps.score?.score) {
+    return false;
+  }
 
   // Compare the fields that actually change (metrics, distribution, security)
   return (

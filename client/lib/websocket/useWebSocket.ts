@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateToken, updateMarketData } from '@/store/dataSlice';
+import { updateTokenHistory } from '@/store/tokenHistorySlice';
 import { setWsConnected } from '@/store/uiSlice';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
@@ -56,6 +57,14 @@ type WebSocketMessage =
 
 export const useWebSocket = (enabled: boolean = true) => {
   const dispatch = useAppDispatch();
+  const tokens = useAppSelector(state => state.data.tokens);
+  const tokensRef = useRef(tokens);
+
+  // Keep tokens ref updated
+  useEffect(() => {
+    tokensRef.current = tokens;
+  }, [tokens]);
+
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
@@ -78,12 +87,32 @@ export const useWebSocket = (enabled: boolean = true) => {
 
           switch (message.type) {
             case 'token_update':
+              // Update token data
               dispatch(
                 updateToken({
                   room: message.room,
                   content: message.content,
                 })
               );
+
+              // Update token history for scoring
+              // Find the token to get created_at
+              const currentTokens = tokensRef.current;
+              const token =
+                currentTokens.new_pairs[message.content.id] ||
+                currentTokens.final_stretch[message.content.id] ||
+                currentTokens.migrated[message.content.id];
+
+              if (token) {
+                dispatch(
+                  updateTokenHistory({
+                    tokenId: message.content.id,
+                    createdAt: token.created_at,
+                    metrics: message.content.delta.metrics,
+                    distribution: message.content.delta.distribution,
+                  })
+                );
+              }
               break;
 
             case 'market_update':

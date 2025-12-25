@@ -1,5 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from './index';
+import { TokenScore } from './tokenHistorySlice';
 
 // Data selectors
 export const selectTokens = (state: RootState) => state.data.tokens;
@@ -13,6 +14,12 @@ export const selectMarketData = (state: RootState) => state.data.market;
 export const selectDataLoading = (state: RootState) => state.data.isLoading;
 export const selectDataError = (state: RootState) => state.data.error;
 export const selectLastUpdate = (state: RootState) => state.data.lastUpdate;
+
+// Token history selectors
+export const selectTokenScores = (state: RootState) =>
+  state.tokenHistory.scores;
+export const selectTokenScore = (state: RootState, tokenId: string) =>
+  state.tokenHistory.scores[tokenId] || null;
 
 // Get token by ID from any room
 export const selectTokenById = (state: RootState, tokenId: string) => {
@@ -58,7 +65,72 @@ export const selectSearchQuery = (state: RootState) => state.ui.searchQuery;
 export const selectSelectedTokenId = (state: RootState) =>
   state.ui.selectedTokenId;
 
-// Filtered tokens (memoized)
+// Token with score for display
+export interface TokenWithScore {
+  token: ReturnType<typeof selectTokenById>;
+  score: TokenScore | null;
+  rank: number;
+  isTopPriority: boolean; // Top 3-5 rows
+  isDeprioritized: boolean; // score <= 2 or repeated inactivity
+}
+
+// Sorted and scored tokens (memoized)
+export const selectSortedTokensWithScores = createSelector(
+  [selectActiveRoomTokens, selectTokenScores, selectSearchQuery],
+  (tokens, scores, searchQuery) => {
+    const query = searchQuery.toLowerCase();
+    let tokenArray = Object.values(tokens);
+
+    // Filter by search query
+    if (query) {
+      tokenArray = tokenArray.filter(
+        token =>
+          token.name.toLowerCase().includes(query) ||
+          token.ticker.toLowerCase().includes(query) ||
+          token.id.toLowerCase().includes(query)
+      );
+    }
+
+    // Map tokens with their scores
+    const tokensWithScores = tokenArray.map(token => {
+      const score = scores[token.id] || null;
+      return { token, score };
+    });
+
+    // Sort by score (descending), then by lastTradeAt (most recent first)
+    tokensWithScores.sort((a, b) => {
+      const scoreA = a.score?.score ?? 0;
+      const scoreB = b.score?.score ?? 0;
+
+      if (scoreB !== scoreA) {
+        return scoreB - scoreA; // Higher score first
+      }
+
+      // If scores are equal, sort by lastTradeAt
+      const timeA = a.score?.lastTradeAt
+        ? new Date(a.score.lastTradeAt).getTime()
+        : 0;
+      const timeB = b.score?.lastTradeAt
+        ? new Date(b.score.lastTradeAt).getTime()
+        : 0;
+      return timeB - timeA; // More recent first
+    });
+
+    // Add rank and priority flags
+    return tokensWithScores.map(
+      (item, index): TokenWithScore => ({
+        token: item.token,
+        score: item.score,
+        rank: index + 1,
+        isTopPriority: index < 5, // Top 5 rows
+        isDeprioritized:
+          (item.score?.score ?? 0) <= 2 || !item.score?.isRecentlyActive,
+      })
+    );
+  }
+);
+
+// Filtered tokens (memoized) - kept for backward compatibility
 export const selectFilteredTokens = createSelector(
   [selectActiveRoomTokens, selectSearchQuery],
   (tokens, searchQuery) => {
