@@ -47,9 +47,19 @@ export const useInitializeData = () => {
 
   // Update loading state
   useEffect(() => {
-    const isLoading = tokensQuery.isLoading || marketQuery.isLoading;
+    const isLoading =
+      tokensQuery.isLoading ||
+      tokensQuery.isFetching ||
+      marketQuery.isLoading ||
+      marketQuery.isFetching;
     dispatch(setLoading(isLoading));
-  }, [tokensQuery.isLoading, marketQuery.isLoading, dispatch]);
+  }, [
+    tokensQuery.isLoading,
+    tokensQuery.isFetching,
+    marketQuery.isLoading,
+    marketQuery.isFetching,
+    dispatch,
+  ]);
 
   // Update error state
   useEffect(() => {

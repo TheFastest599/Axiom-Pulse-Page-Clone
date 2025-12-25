@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from './index';
 
 // Data selectors
@@ -21,29 +22,34 @@ export const selectTokenById = (state: RootState, tokenId: string) => {
   );
 };
 
-// Get all tokens from active room
-export const selectActiveRoomTokens = (state: RootState) => {
-  const activeRoom = state.ui.activeRoom;
-  if (activeRoom === 'all') {
-    return {
-      ...state.data.tokens.new_pairs,
-      ...state.data.tokens.final_stretch,
-      ...state.data.tokens.migrated,
-    };
+// Get all tokens from active room (memoized)
+export const selectActiveRoomTokens = createSelector(
+  [selectTokens, (state: RootState) => state.ui.activeRoom],
+  (tokens, activeRoom) => {
+    if (activeRoom === 'all') {
+      return {
+        ...tokens.new_pairs,
+        ...tokens.final_stretch,
+        ...tokens.migrated,
+      };
+    }
+    return tokens[activeRoom];
   }
-  return state.data.tokens[activeRoom];
-};
+);
 
-// Get token count per room
-export const selectTokenCounts = (state: RootState) => ({
-  new_pairs: Object.keys(state.data.tokens.new_pairs).length,
-  final_stretch: Object.keys(state.data.tokens.final_stretch).length,
-  migrated: Object.keys(state.data.tokens.migrated).length,
-  total:
-    Object.keys(state.data.tokens.new_pairs).length +
-    Object.keys(state.data.tokens.final_stretch).length +
-    Object.keys(state.data.tokens.migrated).length,
-});
+// Get token count per room (memoized)
+export const selectTokenCounts = createSelector(
+  [selectNewPairsTokens, selectFinalStretchTokens, selectMigratedTokens],
+  (newPairs, finalStretch, migrated) => ({
+    new_pairs: Object.keys(newPairs).length,
+    final_stretch: Object.keys(finalStretch).length,
+    migrated: Object.keys(migrated).length,
+    total:
+      Object.keys(newPairs).length +
+      Object.keys(finalStretch).length +
+      Object.keys(migrated).length,
+  })
+);
 
 // UI selectors
 export const selectWsConnected = (state: RootState) => state.ui.wsConnected;
@@ -52,23 +58,22 @@ export const selectSearchQuery = (state: RootState) => state.ui.searchQuery;
 export const selectSelectedTokenId = (state: RootState) =>
   state.ui.selectedTokenId;
 
-// Filtered tokens
-export const selectFilteredTokens = (state: RootState) => {
-  const tokens = selectActiveRoomTokens(state);
-  const searchQuery = state.ui.searchQuery.toLowerCase();
+// Filtered tokens (memoized)
+export const selectFilteredTokens = createSelector(
+  [selectActiveRoomTokens, selectSearchQuery],
+  (tokens, searchQuery) => {
+    const query = searchQuery.toLowerCase();
+    let tokenArray = Object.values(tokens);
 
-  // Convert to array for filtering
-  let tokenArray = Object.values(tokens);
+    if (query) {
+      tokenArray = tokenArray.filter(
+        token =>
+          token.name.toLowerCase().includes(query) ||
+          token.ticker.toLowerCase().includes(query) ||
+          token.id.toLowerCase().includes(query)
+      );
+    }
 
-  // Filter by search query
-  if (searchQuery) {
-    tokenArray = tokenArray.filter(
-      token =>
-        token.name.toLowerCase().includes(searchQuery) ||
-        token.ticker.toLowerCase().includes(searchQuery) ||
-        token.id.toLowerCase().includes(searchQuery)
-    );
+    return tokenArray;
   }
-
-  return tokenArray;
-};
+);
