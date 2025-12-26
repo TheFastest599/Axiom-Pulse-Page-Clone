@@ -9,6 +9,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
+
 import { toast } from 'sonner';
 
 // Protocol configuration with icons and colors
@@ -323,66 +324,123 @@ const TokenCardComponent = ({
         <div className="flex flex-row w-full gap-3 pl-3 pr-3 py-2 justify-start items-center">
           <div className="flex flex-col items-center gap-1">
             <div className="relative w-18.5 h-18.5 justify-center items-center">
-              {protocolConfig && (
-                <div
-                  className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
+              <HoverCard openDelay={10}>
+                <HoverCardTrigger asChild>
+                  <div className="cursor-pointer w-full h-full group/image">
+                    {protocolConfig && (
+                      <div
+                        className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
+                      >
+                        <div className="flex justify-center items-center bg-[#0d0d0f] absolute w-3 h-3 rounded-full z-30">
+                          <img
+                            alt={token.protocol.label}
+                            width={10}
+                            height={10}
+                            src={protocolConfig.icon}
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Camera icon overlay on hover */}
+                    {/* <div className="absolute left-0 top-0 w-20 h-20 P-1 rounded z-40 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity pointer-events-none">
+                      <div className="bg-black/60 w-full h-full flex items-center justify-center rounded">
+                        <i className="ri-camera-line text-white text-2xl"></i>
+                      </div>
+                    </div> */}
+
+                    <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center">
+                      <svg width="78" height="78" viewBox="0 0 78 78">
+                        <defs>
+                          <clipPath id={`rounded-clip-${token.id}`}>
+                            <rect
+                              x="5"
+                              y="5"
+                              width="68"
+                              height="68"
+                              rx="2"
+                              ry="2"
+                            />
+                          </clipPath>
+                        </defs>
+                        <path
+                          className={
+                            protocolConfig
+                              ? protocolConfig.color
+                              : 'text-gray-600'
+                          }
+                          style={{ opacity: 0.4 }}
+                          stroke="currentColor"
+                          fill="transparent"
+                          strokeWidth="1"
+                          d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                        />
+                        <path
+                          className={
+                            protocolConfig
+                              ? protocolConfig.color
+                              : 'text-gray-400'
+                          }
+                          stroke="currentColor"
+                          fill="transparent"
+                          strokeWidth="1"
+                          strokeLinecap="round"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
+                          style={{
+                            transition: 'stroke-dashoffset 0.3s ease-in-out',
+                          }}
+                          d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                        />
+                        {/* Image */}
+                        <image
+                          href={token.image_url}
+                          x="5"
+                          y="5"
+                          width="68"
+                          height="68"
+                          clipPath={`url(#rounded-clip-${token.id})`}
+                          onError={e =>
+                            ((e.target as SVGImageElement).style.display =
+                              'none')
+                          }
+                        />
+                        {/* Camera icon overlay - clipped to same path */}
+                        <g clipPath={`url(#rounded-clip-${token.id})`}>
+                          <rect
+                            x="5"
+                            y="5"
+                            width="68"
+                            height="68"
+                            fill="black"
+                            fillOpacity="0"
+                            className="group-hover/image:fill-opacity-60 transition-all"
+                          />
+                          <foreignObject x="5" y="5" width="68" height="68">
+                            <div className="bg-black/60 w-full h-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity">
+                              <i className="ri-camera-line text-white text-2xl"></i>
+                            </div>
+                          </foreignObject>
+                        </g>
+                      </svg>
+                    </div>
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent
+                  side="bottom"
+                  align="start"
+                  className="w-50 bg-secondary border-gray-800 p-1"
                 >
-                  <div className="flex justify-center items-center bg-[#0d0d0f] absolute w-3 h-3 rounded-full z-30">
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-[#0d0d0f]">
                     <img
-                      alt={token.protocol.label}
-                      width={10}
-                      height={10}
-                      src={protocolConfig.icon}
-                      className="object-cover"
+                      src={token.image_url}
+                      alt={token.name}
+                      className="w-full h-full object-cover"
                     />
                   </div>
-                </div>
-              )}
-
-              <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center">
-                <svg width="78" height="78" viewBox="0 0 78 78">
-                  <path
-                    className={
-                      protocolConfig ? protocolConfig.color : 'text-gray-600'
-                    }
-                    style={{ opacity: 0.4 }}
-                    stroke="currentColor"
-                    fill="transparent"
-                    strokeWidth="1"
-                    d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                  />
-                  <path
-                    className={
-                      protocolConfig ? protocolConfig.color : 'text-gray-400'
-                    }
-                    stroke="currentColor"
-                    fill="transparent"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
-                    style={{ transition: 'stroke-dashoffset 0.3s ease-in-out' }}
-                    d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                  />
-                  {/* Center the image within the SVG path */}
-                  <image
-                    href={token.image_url}
-                    x="5"
-                    y="5"
-                    width="68"
-                    height="68"
-                    clipPath="url(#rounded-clip)"
-                    onError={e =>
-                      ((e.target as SVGImageElement).style.display = 'none')
-                    }
-                  />
-                  <defs>
-                    <clipPath id="rounded-clip">
-                      <rect x="5" y="5" width="68" height="68" rx="2" ry="2" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </div>
+                </HoverCardContent>
+              </HoverCard>
             </div>
             <span
               className="text-gray-500 text-xs font-medium text-center max-w-18.5"
