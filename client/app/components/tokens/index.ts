@@ -4,3 +4,4 @@ export { TokenCard } from './TokenCard';
 export { TokenTabs } from './TokenTabs';
 export { ColumnHeader } from './ColumnHeader';
 export { TokenCardSkeleton, TokenColumnSkeleton } from './TokenSkeleton';
+export { BondingTooltip } from './BondingTooltip';

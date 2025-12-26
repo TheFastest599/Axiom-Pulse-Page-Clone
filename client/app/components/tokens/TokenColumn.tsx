@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useAppSelector } from '@/store/hooks';
 import { selectTokenScores } from '@/store/selectors';
@@ -23,12 +23,49 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
   const isLoading = useAppSelector(state => state.data.isLoading);
   const parentRef = useRef<HTMLDivElement>(null);
 
+  // State to track if column is being interacted with
+  const [isColumnPaused, setIsColumnPaused] = useState(false);
+
+  // Store the order of token IDs when paused (not the full data)
+  const pausedOrderRef = useRef<string[]>([]);
+
+  // Callbacks for handling hover state
+  const handleCardHoverStart = useCallback(() => {
+    setIsColumnPaused(true);
+  }, []);
+
+  const handleCardHoverEnd = useCallback(() => {
+    setIsColumnPaused(false);
+  }, []);
+
   // Memoize sorted token array with scores
   const sortedTokens = useMemo(() => {
     const tokenArray = Object.values(tokens);
 
+    // If column is paused and we have a saved order, use that order with fresh data
+    if (isColumnPaused && pausedOrderRef.current.length > 0) {
+      // Map the paused order to current token data
+      return pausedOrderRef.current
+        .map(tokenId => {
+          const token = tokens[tokenId];
+          if (!token) return null;
+          return {
+            token,
+            score: scores[tokenId] || null,
+          };
+        })
+        .filter(item => item !== null)
+        .map((item, index) => ({
+          ...item!,
+          rank: index + 1,
+          isTopPriority: index < 5,
+          isDeprioritized:
+            (item!.score?.score ?? 0) <= 2 || !item!.score?.isRecentlyActive,
+        }));
+    }
+
     // Sort by score (descending), then by lastTradeAt (most recent first)
-    return tokenArray
+    const newSortedTokens = tokenArray
       .map(token => ({
         token,
         score: scores[token.id] || null,
@@ -56,7 +93,12 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
         isDeprioritized:
           (item.score?.score ?? 0) <= 2 || !item.score?.isRecentlyActive,
       }));
-  }, [tokens, scores]);
+
+    // Store the order of token IDs for when paused
+    pausedOrderRef.current = newSortedTokens.map(item => item.token.id);
+
+    return newSortedTokens;
+  }, [tokens, scores, isColumnPaused]);
 
   const count = sortedTokens.length;
 
@@ -81,7 +123,7 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
           No tokens in this room
         </div>
       ) : (
-        <div ref={parentRef} className="flex-1 overflow-y-auto  scrollbar-thin">
+        <div ref={parentRef} className="flex-1 overflow-y-auto scrollbar-thin">
           <div
             style={{
               height: `${virtualizer.getTotalSize()}px`,
@@ -101,6 +143,8 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
                     width: '100%',
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
+                  onMouseEnter={handleCardHoverStart}
+                  onMouseLeave={handleCardHoverEnd}
                   //   className="pb-2"
                 >
                   <TokenCard
@@ -109,6 +153,7 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
                     rank={item.rank}
                     isTopPriority={item.isTopPriority}
                     isDeprioritized={item.isDeprioritized}
+                    isFirstCard={virtualItem.index === 0}
                   />
                 </div>
               );

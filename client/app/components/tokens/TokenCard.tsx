@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { Globe, Twitter, Send, Search } from 'lucide-react';
 import { TokenScore } from '@/store/tokenHistorySlice';
+import { BondingTooltip } from './BondingTooltip';
 
 // Protocol configuration with icons and colors
 interface ProtocolConfig {
@@ -111,41 +112,6 @@ const PROTOCOL_CONFIG: Record<string, ProtocolConfig> = {
   },
 };
 
-const ProtocolIcon = ({
-  protocolId,
-  label,
-}: {
-  protocolId: string;
-  label: string;
-}) => {
-  const config =
-    PROTOCOL_CONFIG[protocolId] ||
-    PROTOCOL_CONFIG[label.toLowerCase().replace(/[.\s]/g, '_')];
-  if (config) {
-    return (
-      <div
-        className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ${config.bgColor} border ${config.borderColor}`}
-        title={label}
-      >
-        <img
-          src={config.icon}
-          alt={label}
-          className="w-3 h-3"
-          onError={e => ((e.target as HTMLImageElement).style.display = 'none')}
-        />
-        <span className={`text-[0.5625rem] font-medium ${config.color}`}>
-          {label}
-        </span>
-      </div>
-    );
-  }
-  return (
-    <div className="text-[0.5625rem] px-1.5 py-0.5 h-auto border border-gray-700 text-gray-500 rounded-full">
-      {label}
-    </div>
-  );
-};
-
 interface Token {
   id: string;
   name: string;
@@ -197,6 +163,7 @@ interface TokenCardProps {
   isTopPriority?: boolean;
   isDeprioritized?: boolean;
   style?: React.CSSProperties;
+  isFirstCard?: boolean;
 }
 
 const formatRelativeTime = (dateString: string): string => {
@@ -238,326 +205,330 @@ const TokenCardComponent = ({
     PROTOCOL_CONFIG[token.protocol.label.toLowerCase().replace(/[.\s]/g, '_')];
 
   return (
-    <div
-      className="w-full h-full flex flex-col bg-[#0d0d0f] border border-gray-800 hover:border-gray-700 transition-all relative group"
-      style={style}
-      title={`Bonding: ${bondingProgress.toFixed(2)}%`}
-    >
-      <div className="absolute right-4 top-4 z-10">
-        <div className="flex flex-col gap-0.5 items-end">
-          <div className="relative">
-            <div
-              className="absolute z-0"
-              style={{ inset: '-12px -8px 1px -4px' }}
-            >
-              <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
-              <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
-            </div>
-            <div className="relative flex flex-row gap-2 justify-end items-end z-20">
-              <div className="flex flex-row h-4.5 gap-1 justify-end items-end">
-                <span
-                  className="text-gray-500 text-xs font-medium pb-[0.1rem]"
-                  title="Market Cap"
-                >
-                  MC
-                </span>
-                <span
-                  className={`text-base font-medium ${
-                    token.metrics.price_change_dir === 'up'
-                      ? 'text-cyan-400'
-                      : 'text-red-400'
-                  }`}
-                >
-                  {formatCurrency(token.metrics.market_cap)}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="relative">
-            <div
-              className="absolute z-0"
-              style={{ inset: '-12px -8px 1px -4px' }}
-            >
-              <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
-              <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
-            </div>
-            <div className="relative flex flex-row gap-2 justify-end items-end z-20">
-              <div className="flex flex-row h-4.5 gap-1 justify-end items-end">
-                <span
-                  className="text-gray-500 text-xs font-medium pb-[0.1rem]"
-                  title="Volume 24h"
-                >
-                  V
-                </span>
-                <span className="text-base font-medium text-white">
-                  {formatCurrency(token.metrics.volume_24h)}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="relative flex flex-row gap-2 items-start -mt-0.5">
-            <div
-              className="absolute z-0"
-              style={{ inset: '-2px -8px -4px -4px' }}
-            >
-              <div className="group-hover:bg-gray-800/50 absolute inset-0 z-[5]"></div>
-              <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
-            </div>
-            <div className="relative flex flex-row justify-end items-center h-3 gap-1 z-20">
-              <img
-                src="/icons/solana-sol-logo.svg"
-                alt={'solana'}
-                className="w-3 h-3"
-                onError={e =>
-                  ((e.target as HTMLImageElement).style.display = 'none')
-                }
-              />
-              <span className="text-white text-xs font-medium">
-                {token.metrics.price_sol.toFixed(3)}
-              </span>
-            </div>
-            <div className="relative flex flex-row justify-end items-center h-3 gap-1 z-20">
-              <span
-                className="text-gray-500 text-[0.6875rem] font-medium"
-                title="Transactions"
+    <BondingTooltip bondingProgress={bondingProgress}>
+      <div
+        className="w-full h-full flex flex-col bg-[#0d0d0f] border border-gray-800 hover:border-gray-700 transition-all relative group"
+        style={style}
+      >
+        <div className="absolute right-4 top-4 z-10">
+          <div className="flex flex-col gap-0.5 items-end">
+            <div className="relative">
+              <div
+                className="absolute z-0"
+                style={{ inset: '-12px -8px 1px -4px' }}
               >
-                TX{' '}
-                <span className="text-white text-[0.6875rem] font-medium">
-                  {token.metrics.transactions}
+                <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
+                <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
+              </div>
+              <div className="relative flex flex-row gap-2 justify-end items-end z-20">
+                <div className="flex flex-row h-4.5 gap-1 justify-end items-end">
+                  <span
+                    className="text-gray-500 text-xs font-medium pb-[0.1rem]"
+                    title="Market Cap"
+                  >
+                    MC
+                  </span>
+                  <span
+                    className={`text-base font-medium ${
+                      token.metrics.price_change_dir === 'up'
+                        ? 'text-cyan-400'
+                        : 'text-red-400'
+                    }`}
+                  >
+                    {formatCurrency(token.metrics.market_cap)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div
+                className="absolute z-0"
+                style={{ inset: '-12px -8px 1px -4px' }}
+              >
+                <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
+                <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
+              </div>
+              <div className="relative flex flex-row gap-2 justify-end items-end z-20">
+                <div className="flex flex-row h-4.5 gap-1 justify-end items-end">
+                  <span
+                    className="text-gray-500 text-xs font-medium pb-[0.1rem]"
+                    title="Volume 24h"
+                  >
+                    V
+                  </span>
+                  <span className="text-base font-medium text-white">
+                    {formatCurrency(token.metrics.volume_24h)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="relative flex flex-row gap-2 items-start -mt-0.5">
+              <div
+                className="absolute z-0"
+                style={{ inset: '-2px -8px -4px -4px' }}
+              >
+                <div className="group-hover:bg-gray-800/50 absolute inset-0 z-5"></div>
+                <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
+              </div>
+              <div className="relative flex flex-row justify-end items-center h-3 gap-1 z-20">
+                <img
+                  src="/icons/solana-sol-logo.svg"
+                  alt={'solana'}
+                  className="w-3 h-3"
+                  onError={e =>
+                    ((e.target as HTMLImageElement).style.display = 'none')
+                  }
+                />
+                <span className="text-white text-xs font-medium">
+                  {token.metrics.price_sol.toFixed(3)}
                 </span>
-              </span>
-              <div className="flex flex-row min-w-6 max-w-6 h-0.5 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className="h-1 bg-green-500"
-                  style={{ width: '50%' }}
-                ></div>
-                <div className="h-1 bg-red-500" style={{ width: '50%' }}></div>
+              </div>
+              <div className="relative flex flex-row justify-end items-center h-3 gap-1 z-20">
+                <span
+                  className="text-gray-500 text-[0.6875rem] font-medium"
+                  title="Transactions"
+                >
+                  TX{' '}
+                  <span className="text-white text-[0.6875rem] font-medium">
+                    {token.metrics.transactions}
+                  </span>
+                </span>
+                <div className="flex flex-row min-w-6 max-w-6 h-0.5 bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-1 bg-green-500"
+                    style={{ width: '50%' }}
+                  ></div>
+                  <div
+                    className="h-1 bg-red-500"
+                    style={{ width: '50%' }}
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-row w-full gap-3 pl-3 pr-3 py-2 justify-start items-center">
-        <div className="flex flex-col items-center gap-1">
-          <div className="relative w-18.5 h-18.5 justify-center items-center">
-            {protocolConfig && (
-              <div
-                className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
-              >
-                <div className="flex justify-center items-center bg-[#0d0d0f] absolute w-3 h-3 rounded-full z-30">
-                  <img
-                    alt={token.protocol.label}
-                    width={10}
-                    height={10}
-                    src={protocolConfig.icon}
-                    className="object-cover"
+        <div className="flex flex-row w-full gap-3 pl-3 pr-3 py-2 justify-start items-center">
+          <div className="flex flex-col items-center gap-1">
+            <div className="relative w-18.5 h-18.5 justify-center items-center">
+              {protocolConfig && (
+                <div
+                  className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
+                >
+                  <div className="flex justify-center items-center bg-[#0d0d0f] absolute w-3 h-3 rounded-full z-30">
+                    <img
+                      alt={token.protocol.label}
+                      width={10}
+                      height={10}
+                      src={protocolConfig.icon}
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center">
+                <svg width="78" height="78" viewBox="0 0 78 78">
+                  <path
+                    className={
+                      protocolConfig ? protocolConfig.color : 'text-gray-600'
+                    }
+                    style={{ opacity: 0.4 }}
+                    stroke="currentColor"
+                    fill="transparent"
+                    strokeWidth="1"
+                    d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                  />
+                  <path
+                    className={
+                      protocolConfig ? protocolConfig.color : 'text-gray-400'
+                    }
+                    stroke="currentColor"
+                    fill="transparent"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    style={{ transition: 'stroke-dashoffset 0.3s ease-in-out' }}
+                    d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                  />
+                  {/* Center the image within the SVG path */}
+                  <image
+                    href={token.image_url}
+                    x="5"
+                    y="5"
+                    width="68"
+                    height="68"
+                    clipPath="url(#rounded-clip)"
+                    onError={e =>
+                      ((e.target as SVGImageElement).style.display = 'none')
+                    }
+                  />
+                  <defs>
+                    <clipPath id="rounded-clip">
+                      <rect x="5" y="5" width="68" height="68" rx="2" ry="2" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+            <span
+              className="text-gray-500 text-xs font-medium text-center max-w-18.5"
+              title={token.id}
+            >
+              {token.id.slice(0, 4)}...{token.id.slice(-4)}
+            </span>
+          </div>
+
+          <div className="flex flex-col flex-1 h-full gap-5 justify-start items-start pt-0 pb-3 overflow-hidden">
+            <div className="flex flex-col w-full gap-0.5 justify-start items-start min-w-0">
+              <div className="flex flex-row min-h-4.5 w-full gap-1 justify-between items-start min-w-0">
+                <div className="overflow-hidden">
+                  <div className="flex flex-row gap-1 justify-start items-center">
+                    <div className="min-w-0 whitespace-nowrap overflow-hidden truncate text-white text-base font-medium tracking-[-0.02em]">
+                      {token.ticker}
+                    </div>
+                    <div className="min-w-0 overflow-hidden text-gray-500 text-base font-medium tracking-[-0.02em] truncate">
+                      {token.name}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row w-full h-4.5 gap-3 justify-start items-center">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-sm font-medium ${
+                      bondingProgress > 50 ? 'text-green-400' : 'text-gray-400'
+                    }`}
+                  >
+                    {timeAgo}
+                  </span>
+                </div>
+                {/* social links */}
+                <div className="flex flex-row shrink-0 gap-2 justify-start items-center">
+                  {social_links.website && (
+                    <a
+                      href={social_links.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                      title="Website"
+                    >
+                      <Globe className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors" />
+                    </a>
+                  )}
+                  {social_links.twitter && (
+                    <a
+                      href={social_links.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                      title="Twitter"
+                    >
+                      <Twitter className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors" />
+                    </a>
+                  )}
+                  {social_links.telegram && (
+                    <a
+                      href={social_links.telegram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                      title="Telegram"
+                    >
+                      <Send className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors" />
+                    </a>
+                  )}
+                  <Search
+                    className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors cursor-pointer"
+                    //   title="Search"
                   />
                 </div>
-              </div>
-            )}
-
-            <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center">
-              <svg width="78" height="78" viewBox="0 0 78 78">
-                <path
-                  className={
-                    protocolConfig ? protocolConfig.color : 'text-gray-600'
-                  }
-                  style={{ opacity: 0.4 }}
-                  stroke="currentColor"
-                  fill="transparent"
-                  strokeWidth="1"
-                  d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                />
-                <path
-                  className={
-                    protocolConfig ? protocolConfig.color : 'text-gray-400'
-                  }
-                  stroke="currentColor"
-                  fill="transparent"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={strokeDashoffset}
-                  style={{ transition: 'stroke-dashoffset 0.3s ease-in-out' }}
-                  d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                />
-                {/* Center the image within the SVG path */}
-                <image
-                  href={token.image_url}
-                  x="5"
-                  y="5"
-                  width="68"
-                  height="68"
-                  clipPath="url(#rounded-clip)"
-                  onError={e =>
-                    ((e.target as SVGImageElement).style.display = 'none')
-                  }
-                />
-                <defs>
-                  <clipPath id="rounded-clip">
-                    <rect x="5" y="5" width="68" height="68" rx="2" ry="2" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-          </div>
-          <span
-            className="text-gray-500 text-xs font-medium text-center max-w-18.5"
-            title={token.id}
-          >
-            {token.id.slice(0, 4)}...{token.id.slice(-4)}
-          </span>
-        </div>
-
-        <div className="flex flex-col flex-1 h-full gap-5 justify-start items-start pt-0 pb-3 overflow-hidden">
-          <div className="flex flex-col w-full gap-0.5 justify-start items-start min-w-0">
-            <div className="flex flex-row min-h-4.5 w-full gap-1 justify-between items-start min-w-0">
-              <div className="overflow-hidden">
-                <div className="flex flex-row gap-1 justify-start items-center">
-                  <div className="min-w-0 whitespace-nowrap overflow-hidden truncate text-white text-base font-medium tracking-[-0.02em]">
-                    {token.ticker}
+                {/* distribution */}
+                <div className="flex flex-row flex-1 h-4.5 gap-2 justify-start items-center">
+                  <div
+                    className="flex flex-row gap-0.5 h-4 justify-start items-center"
+                    title="Holders"
+                  >
+                    <i className="ri-group-line text-gray-400 text-base"></i>
+                    <span className="text-xs font-medium text-white">
+                      {token.distribution.holders}
+                    </span>
                   </div>
-                  <div className="min-w-0 overflow-hidden text-gray-500 text-base font-medium tracking-[-0.02em] truncate">
-                    {token.name}
+                  <div
+                    className="flex flex-row gap-0.5 h-4 justify-center items-center shrink-0"
+                    title="Pro Traders"
+                  >
+                    <i className="ri-line-chart-line text-gray-400 text-base"></i>
+                    <span className="text-white text-xs font-medium">
+                      {token.distribution.pro_traders}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex flex-row w-full h-4.5 gap-3 justify-start items-center">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-sm font-medium ${
-                    bondingProgress > 50 ? 'text-green-400' : 'text-gray-400'
-                  }`}
-                >
-                  {timeAgo}
+
+            <div className="flex flex-row w-full h-6 gap-1 justify-start items-end">
+              <div
+                className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
+                title="Developer Holdings"
+              >
+                <i className="ri-user-star-line text-sm text-green-400"></i>
+                <span className="text-green-400 text-xs font-medium">
+                  {token.distribution.dev_status.dev_hold_percent.toFixed(0)}%
                 </span>
               </div>
-              {/* social links */}
-              <div className="flex flex-row shrink-0 gap-2 justify-start items-center">
-                {social_links.website && (
-                  <a
-                    href={social_links.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center"
-                    title="Website"
-                  >
-                    <Globe className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors" />
-                  </a>
-                )}
-                {social_links.twitter && (
-                  <a
-                    href={social_links.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center"
-                    title="Twitter"
-                  >
-                    <Twitter className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors" />
-                  </a>
-                )}
-                {social_links.telegram && (
-                  <a
-                    href={social_links.telegram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center"
-                    title="Telegram"
-                  >
-                    <Send className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors" />
-                  </a>
-                )}
-                <Search
-                  className="w-4 h-4 text-gray-400 hover:text-cyan-400 transition-colors cursor-pointer"
-                  //   title="Search"
-                />
+              <div
+                className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
+                title="Bundle Holdings"
+              >
+                <i className="ri-archive-line text-sm text-yellow-400"></i>
+                <span className="text-yellow-400 text-xs font-medium">
+                  {token.distribution.bundle_holding.toFixed(0)}%
+                </span>
               </div>
-              {/* distribution */}
-              <div className="flex flex-row flex-1 h-4.5 gap-2 justify-start items-center">
-                <div
-                  className="flex flex-row gap-0.5 h-4 justify-start items-center"
-                  title="Holders"
-                >
-                  <i className="ri-group-line text-gray-400 text-base"></i>
-                  <span className="text-xs font-medium text-white">
-                    {token.distribution.holders}
-                  </span>
-                </div>
-                <div
-                  className="flex flex-row gap-0.5 h-4 justify-center items-center shrink-0"
-                  title="Pro Traders"
-                >
-                  <i className="ri-line-chart-line text-gray-400 text-base"></i>
-                  <span className="text-white text-xs font-medium">
-                    {token.distribution.pro_traders}
-                  </span>
-                </div>
+              <div
+                className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
+                title="Sniper Holdings"
+              >
+                <i className="ri-crosshair-2-line text-sm text-gray-400"></i>
+                <span className="text-gray-400 text-xs font-medium">
+                  {token.distribution.snipers_holding.toFixed(0)}%
+                </span>
               </div>
-            </div>
-          </div>
-
-          <div className="flex flex-row w-full h-6 gap-1 justify-start items-end">
-            <div
-              className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
-              title="Developer Holdings"
-            >
-              <i className="ri-user-star-line text-sm text-green-400"></i>
-              <span className="text-green-400 text-xs font-medium">
-                {token.distribution.dev_status.dev_hold_percent.toFixed(0)}%
-              </span>
-            </div>
-            <div
-              className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
-              title="Bundle Holdings"
-            >
-              <i className="ri-archive-line text-sm text-yellow-400"></i>
-              <span className="text-yellow-400 text-xs font-medium">
-                {token.distribution.bundle_holding.toFixed(0)}%
-              </span>
-            </div>
-            <div
-              className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
-              title="Sniper Holdings"
-            >
-              <i className="ri-crosshair-2-line text-sm text-gray-400"></i>
-              <span className="text-gray-400 text-xs font-medium">
-                {token.distribution.snipers_holding.toFixed(0)}%
-              </span>
-            </div>
-            <div
-              className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
-              title="Top 10 Holders"
-            >
-              <i className="ri-vip-crown-2-line text-sm text-gray-400"></i>
-              <span className="text-gray-400 text-xs font-medium">
-                {token.security.top_10_holders_pct.toFixed(0)}%
-              </span>
-            </div>
-            <div
-              className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
-              title="LP Burned"
-            >
-              <i className="ri-fire-line text-sm text-gray-400"></i>
-              <span className="text-gray-400 text-xs font-medium">
-                {token.security.lp_burned}%
-              </span>
+              <div
+                className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
+                title="Top 10 Holders"
+              >
+                <i className="ri-vip-crown-2-line text-sm text-gray-400"></i>
+                <span className="text-gray-400 text-xs font-medium">
+                  {token.security.top_10_holders_pct.toFixed(0)}%
+                </span>
+              </div>
+              <div
+                className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border"
+                title="LP Burned"
+              >
+                <i className="ri-fire-line text-sm text-gray-400"></i>
+                <span className="text-gray-400 text-xs font-medium">
+                  {token.security.lp_burned}%
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="absolute right-3 bottom-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          type="button"
-          className="bg-cyan-500 hover:bg-cyan-400 text-[#090909] flex flex-row gap-1 justify-center items-center rounded-full h-6 px-1.5 whitespace-nowrap transition-all relative overflow-hidden"
-        >
-          <i className="ri-flashlight-fill text-base flex items-center relative z-10"></i>
-          <span className="text-xs font-bold relative z-10">0 SOL</span>
-        </button>
+        <div className="absolute right-3 bottom-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            className="bg-cyan-500 hover:bg-cyan-400 text-[#090909] flex flex-row gap-1 justify-center items-center rounded-full h-6 px-1.5 whitespace-nowrap transition-all relative overflow-hidden"
+          >
+            <i className="ri-flashlight-fill text-base flex items-center relative z-10"></i>
+            <span className="text-xs font-bold relative z-10">0 SOL</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </BondingTooltip>
   );
 };
 
