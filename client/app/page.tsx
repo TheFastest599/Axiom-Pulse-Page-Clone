@@ -1,17 +1,56 @@
+'use client';
+
 import { TokenGrid } from './components/tokens';
+import {
+  TopNavBar,
+  PulseHeader,
+  PulseControls,
+  RoomTabs,
+  BottomNavigation,
+  DesktopBottomBar,
+} from './components/layout';
+import { useAppSelector } from '@/store/hooks';
 
 export default function Home() {
-  return (
-    <div className="h-screen flex flex-col">
-      {/* Header placeholder - will be built later */}
-      <header className="h-14 border-b border-gray-800 flex items-center px-4">
-        <h1 className="text-lg font-semibold">Pulse</h1>
-      </header>
+  const activeRoom = useAppSelector(state => state.ui.activeRoom);
 
-      {/* Main content */}
-      <main className="flex-1 overflow-hidden">
-        <TokenGrid />
+  return (
+    <div className="h-screen flex flex-col bg-[#0d0d0f]">
+      {/* Top Navigation Bar */}
+      <TopNavBar />
+
+      {/* Pulse Header */}
+      <PulseHeader />
+
+      {/* Pulse Controls */}
+      <PulseControls />
+
+      {/* Room Tabs - Mobile/Tablet only */}
+      <div className="lg:hidden">
+        <RoomTabs />
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 mx-1 sm:mx-4 lg:mx-6 overflow-hidden mb-0  sm:mb-6">
+        {/* Desktop: 3-column grid */}
+        <div className="hidden lg:block h-full">
+          <TokenGrid singleColumn={false} />
+        </div>
+
+        {/* Mobile/Tablet: Single column */}
+        <div className="lg:hidden h-full">
+          <TokenGrid
+            singleColumn={true}
+            activeRoom={activeRoom === 'all' ? 'new_pairs' : activeRoom}
+          />
+        </div>
       </main>
+
+      {/* Desktop Bottom Bar */}
+      <DesktopBottomBar />
+
+      {/* Bottom Navigation - Mobile only */}
+      <BottomNavigation />
     </div>
   );
 }
