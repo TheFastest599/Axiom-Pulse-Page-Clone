@@ -119,7 +119,7 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
   const virtualItems = virtualizer.getVirtualItems();
 
   return (
-    <div className="flex flex-col max-h-[80vh] lg:max-h-[85vh]  border-r border-gray-800 last:border-r-0">
+    <div className="flex flex-col h-[65vh] lg:h-[70vh] xl:h-[75vh] border-r border-gray-800 last:border-r-0">
       <ColumnHeader title={title} count={count} />
 
       {isLoading ? (
