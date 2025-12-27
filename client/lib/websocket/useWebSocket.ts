@@ -78,7 +78,7 @@ export const useWebSocket = (enabled: boolean = true) => {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('🔌 WebSocket connected');
+        console.log('WebSocket connected');
         dispatch(setWsConnected(true));
         reconnectAttemptsRef.current = 0;
       };
@@ -130,23 +130,23 @@ export const useWebSocket = (enabled: boolean = true) => {
               break;
 
             case 'connected':
-              console.log('✅ WebSocket handshake:', message.message);
+              console.log('WebSocket handshake:', message.message);
               break;
 
-            default:
-              console.log('📩 Unknown message type:', message);
+            // default:
+            //   console.log('📩 Unknown message type:', message);
           }
         } catch (error) {
-          console.error('❌ Error parsing WebSocket message:', error);
+          console.error('Error parsing WebSocket message:', error);
         }
       };
 
       ws.onerror = error => {
-        console.error('❌ WebSocket error:', error);
+        console.error('WebSocket error:', error);
       };
 
       ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected');
+        console.log('WebSocket disconnected');
         dispatch(setWsConnected(false));
 
         // Attempt to reconnect
@@ -157,18 +157,18 @@ export const useWebSocket = (enabled: boolean = true) => {
             30000
           );
           console.log(
-            `🔄 Reconnecting in ${delay}ms... (attempt ${reconnectAttemptsRef.current})`
+            `Reconnecting in ${delay}ms... (attempt ${reconnectAttemptsRef.current})`
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, delay);
         } else {
-          console.error('❌ Max reconnection attempts reached');
+          console.error('Max reconnection attempts reached');
         }
       };
     } catch (error) {
-      console.error('❌ Error creating WebSocket:', error);
+      console.error('Error creating WebSocket:', error);
     }
   };
 

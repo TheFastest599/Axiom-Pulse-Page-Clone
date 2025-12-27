@@ -3,6 +3,7 @@
 import { useAppSelector } from '@/store/hooks';
 import { selectActiveRoom } from '@/store/selectors';
 import { TokenColumn } from './TokenColumn';
+import { TokenGridHeader } from './TokenGridHeader';
 
 type Room = 'new_pairs' | 'final_stretch' | 'migrated';
 
@@ -30,7 +31,8 @@ export const TokenGrid = ({
     const roomData = rooms.find(r => r.id === room);
 
     return (
-      <div className="h-full">
+      <div className="h-full bg-secondary/20 rounded-md">
+        <TokenGridHeader />
         <TokenColumn room={room} title={roomData?.title || 'New Pairs'} />
       </div>
     );
@@ -38,7 +40,7 @@ export const TokenGrid = ({
 
   // Three column mode (desktop)
   return (
-    <div className="h-full grid grid-cols-3">
+    <div className="h-full grid grid-cols-3 bg-secondary/20 rounded-md border border-gray-800 ">
       {rooms.map(room => (
         <TokenColumn key={room.id} room={room.id} title={room.title} />
       ))}

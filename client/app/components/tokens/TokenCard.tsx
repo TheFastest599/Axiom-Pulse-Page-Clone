@@ -214,7 +214,7 @@ const TokenCardComponent = ({
   return (
     <BondingTooltip bondingProgress={bondingProgress}>
       <div
-        className="w-full h-full flex flex-col bg-[#0d0d0f] border border-gray-800 hover:border-gray-700 transition-all relative group"
+        className="w-full h-full flex flex-col  border border-gray-800 hover:border-gray-700 transition-all relative group"
         style={style}
       >
         <div className="absolute right-4 top-4 z-10">
@@ -225,7 +225,7 @@ const TokenCardComponent = ({
                 style={{ inset: '-12px -8px 1px -4px' }}
               >
                 <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
-                <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
+                <div className=" absolute inset-0 z-0"></div>
               </div>
               <div className="relative flex flex-row gap-2 justify-end items-end z-20">
                 <div
@@ -256,7 +256,7 @@ const TokenCardComponent = ({
                 style={{ inset: '-12px -8px 1px -4px' }}
               >
                 <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
-                <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
+                <div className=" absolute inset-0 z-0"></div>
               </div>
               <div className="relative flex flex-row gap-2 justify-end items-end z-20">
                 <div
@@ -278,7 +278,7 @@ const TokenCardComponent = ({
                 style={{ inset: '-2px -8px -4px -4px' }}
               >
                 <div className="group-hover:bg-gray-800/50 absolute inset-0 z-5"></div>
-                <div className="bg-[#0d0d0f] absolute inset-0 z-0"></div>
+                <div className=" absolute inset-0 z-0"></div>
               </div>
               <div
                 className="relative flex flex-row justify-end items-center h-3 gap-1 z-20 cursor-pointer"
@@ -331,7 +331,7 @@ const TokenCardComponent = ({
                       <div
                         className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
                       >
-                        <div className="flex justify-center items-center bg-[#0d0d0f] absolute w-3 h-3 rounded-full z-30">
+                        <div className="flex justify-center items-center  absolute w-3 h-3 rounded-full z-30">
                           <img
                             alt={token.protocol.label}
                             width={10}
@@ -432,7 +432,7 @@ const TokenCardComponent = ({
                   align="start"
                   className="w-50 bg-secondary border-gray-800 p-1"
                 >
-                  <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-[#0d0d0f]">
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden ">
                     <img
                       src={token.image_url}
                       alt={token.name}

@@ -12,17 +12,17 @@ export const MobileHeader = () => {
   const activeRoom = useAppSelector(state => state.ui.activeRoom);
 
   return (
-    <div className="flex sm:hidden flex-col max-w-full border-b border-border/50 py-4">
+    <header className="flex sm:hidden flex-col w-full border-b border-border/50 pb-4">
       {/* Main Row */}
-      <div className="flex items-center w-full h-6 px-4 gap-2 justify-between">
+      <div className="flex items-center w-full px-4 gap-2 justify-between overflow-hidden">
         {/* Left: Chain Selector + Room Tabs */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
           {/* Chain Selector */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full bg-accent scale-110"
+              className="h-8 w-8 rounded-full bg-accent "
               aria-label="Switch to Solana"
             >
               <Image
@@ -54,7 +54,7 @@ export const MobileHeader = () => {
             <div className="flex gap-2">
               <Button
                 onClick={() => dispatch(setActiveRoom('new_pairs'))}
-                className={`py-4 px-3 rounded-full text-sm font-medium whitespace-nowrap active:scale-[0.98] active:opacity-95 ${
+                className={`h-8 px-3 rounded-full text-sm font-medium whitespace-nowrap active:scale-[0.98] active:opacity-95 ${
                   activeRoom === 'new_pairs'
                     ? 'bg-secondary text-foreground'
                     : 'bg-secondary/80 text-muted-foreground active:text-foreground'
@@ -65,7 +65,7 @@ export const MobileHeader = () => {
 
               <Button
                 onClick={() => dispatch(setActiveRoom('final_stretch'))}
-                className={`py-4 px-3 rounded-full text-sm font-medium whitespace-nowrap active:scale-[0.98] active:opacity-95 ${
+                className={`h-8 px-3 rounded-full text-sm font-medium whitespace-nowrap active:scale-[0.98] active:opacity-95 ${
                   activeRoom === 'final_stretch'
                     ? 'bg-secondary text-foreground'
                     : 'bg-secondary/80 text-muted-foreground active:text-foreground'
@@ -76,7 +76,7 @@ export const MobileHeader = () => {
 
               <Button
                 onClick={() => dispatch(setActiveRoom('migrated'))}
-                className={`py-4 px-3 rounded-full text-sm font-medium whitespace-nowrap active:scale-[0.98] active:opacity-95 ${
+                className={`h-8 px-3 rounded-full text-sm font-medium whitespace-nowrap active:scale-[0.98] active:opacity-95 ${
                   activeRoom === 'migrated'
                     ? 'bg-secondary text-foreground'
                     : 'bg-secondary/80 text-muted-foreground active:text-foreground'
@@ -93,7 +93,7 @@ export const MobileHeader = () => {
           variant="outline"
           size="icon"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="min-w-9 h-9 rounded-full border-border bg-transparent active:scale-[0.96] active:bg-accent/40"
+          className="min-w-9 h-9 rounded-full border-border bg-transparent active:scale-[0.96] active:bg-accent/40 flex-shrink-0"
         >
           <i
             className={`ri-arrow-up-s-line text-xl transition-transform duration-150 ${
@@ -111,10 +111,10 @@ export const MobileHeader = () => {
       >
         <div className="flex flex-col gap-4 pt-6">
           {/* Row 1: Display, Bookmark, Settings, Question, Filter */}
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between gap-2 w-full ">
+            <div className="flex items-center gap-2">
               {/* Display Dropdown */}
-              <Button className="h-8 px-3 gap-2 rounded-full bg-accent active:bg-accent/80 active:scale-[0.96]">
+              <Button className="h-8 px-3 gap-2 rounded-full bg-accent active:bg-accent/80 active:scale-[0.96] flex-shrink-0">
                 <i className="ri-list-check text-lg text-foreground" />
                 <span className="text-sm font-bold text-foreground">
                   Display
@@ -126,30 +126,34 @@ export const MobileHeader = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-full bg-background active:bg-accent/60 active:scale-[0.96] group"
+                className="h-8 w-8 rounded-full bg-background active:bg-accent/60 active:scale-[0.96] group flex-shrink-0"
               >
-                <i className="icon-bookmark-x text-xl text-muted-foreground group-active:text-foreground" />
+                <i className="ri-bookmark-3-line text-xl  group-active:text-foreground" />
               </Button>
 
               {/* Crosshair + Settings */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-full bg-background active:bg-accent/60 active:scale-[0.96] group relative"
+                className="h-8 w-8 rounded-full bg-background active:bg-accent/60 active:scale-[0.96] group relative flex-shrink-0"
               >
-                <i className="ri-crosshair-2-line text-xl text-muted-foreground group-active:text-foreground" />
+                <i className="ri-crosshair-2-line text-xl  group-active:text-foreground" />
                 <i className="ri-settings-3-line text-xs text-muted-foreground group-active:text-foreground absolute bottom-0 right-[-3px]" />
               </Button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {/* Question */}
-              <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 p-0 flex-shrink-0"
+              >
                 <i className="ri-question-line text-xl text-muted-foreground hover:text-foreground" />
               </Button>
 
               {/* Filter Dropdown */}
-              <Button className="h-8 px-3 gap-2 rounded-full bg-accent active:bg-accent/80 active:scale-[0.96]">
+              <Button className="h-8 px-3 gap-2 rounded-full bg-accent active:bg-accent/80 active:scale-[0.96] flex-shrink-0">
                 <i className="ri-equalizer-3-line text-lg text-foreground" />
                 <span className="text-sm font-bold text-foreground">
                   Filter
@@ -160,11 +164,11 @@ export const MobileHeader = () => {
           </div>
 
           {/* Row 2: Wallet Counter + Flash Input with Presets */}
-          <div className="flex items-center gap-4 justify-between">
+          <div className="flex items-center gap-2 w-full overflow-hidden">
             {/* Wallet Counter */}
             <Button
               variant="outline"
-              className="h-8 px-3 gap-2 rounded-full border-border active:bg-accent/35 active:scale-[0.96] group"
+              className="h-8 px-3 gap-2 rounded-full border-border active:bg-accent/35 active:scale-[0.96] group flex-shrink-0"
             >
               <div className="flex items-center gap-1">
                 <i className="ri-wallet-line text-lg text-muted-foreground group-hover:text-foreground" />
@@ -185,14 +189,14 @@ export const MobileHeader = () => {
             </Button>
 
             {/* Flash Input with Presets */}
-            <div className="flex-1 w-full flex h-8 items-center gap-2 pl-3 border border-border rounded-full active:bg-accent/35">
-              <i className="ri-flashlight-fill text-sm text-muted-foreground" />
+            <div className="flex-1 min-w-0 flex h-8 items-center gap-1.5 pl-2 border border-border rounded-full active:bg-accent/35 overflow-hidden">
+              <i className="ri-flashlight-fill text-sm text-muted-foreground flex-shrink-0" />
 
               <input
                 placeholder="0.0"
                 type="text"
                 defaultValue="0"
-                className="flex-1 min-w-0 text-sm text-foreground placeholder:text-muted-foreground font-medium outline-none bg-transparent"
+                className="flex-1 w-8 min-w-0 text-sm text-foreground placeholder:text-muted-foreground font-medium outline-none bg-transparent"
               />
 
               <Image
@@ -200,16 +204,17 @@ export const MobileHeader = () => {
                 width={16}
                 height={16}
                 src="/icons/solana-sol-logo.svg"
+                className="flex-shrink-0"
               />
 
               {/* Presets */}
-              <div className="flex h-full items-center gap-1.5 pl-1 pr-1 border-l border-border">
+              <div className="flex h-full items-center gap-1 pl-1 pr-0.5 border-l border-border flex-shrink-0">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 rounded hover:bg-primary/10"
+                  className="h-5 w-5 p-0 rounded hover:bg-primary/10"
                 >
-                  <span className="text-xs font-medium text-primary hover:text-primary/80">
+                  <span className="text-[10px] font-medium text-primary hover:text-primary/80">
                     P1
                   </span>
                 </Button>
@@ -217,9 +222,9 @@ export const MobileHeader = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 rounded hover:bg-accent"
+                  className="h-5 w-5 p-0 rounded hover:bg-accent"
                 >
-                  <span className="text-xs font-medium text-muted-foreground">
+                  <span className="text-[10px] font-medium text-muted-foreground">
                     P2
                   </span>
                 </Button>
@@ -227,9 +232,9 @@ export const MobileHeader = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 rounded-r-full rounded-l hover:bg-accent"
+                  className="h-5 w-5 p-0 rounded-r-full rounded-l hover:bg-accent"
                 >
-                  <span className="text-xs font-medium text-muted-foreground">
+                  <span className="text-[10px] font-medium text-muted-foreground">
                     P3
                   </span>
                 </Button>
@@ -238,6 +243,6 @@ export const MobileHeader = () => {
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };

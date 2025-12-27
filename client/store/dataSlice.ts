@@ -183,7 +183,7 @@ const dataSlice = createSlice({
           // Remove from old room
           delete state.tokens[currentRoom][id];
 
-          console.log(`🔄 Token ${id} moved: ${currentRoom} → ${newRoom}`);
+          // console.log(`🔄 Token ${id} moved: ${currentRoom} → ${newRoom}`);
         }
       } else {
         // Normal update - no room change

@@ -4,7 +4,6 @@ import { TokenGrid } from './components/tokens';
 import {
   TopNavBar,
   ControlBar,
-  RoomTabs,
   BottomNavigation,
   DesktopBottomBar,
   PulseHeader,
@@ -15,20 +14,15 @@ export default function Home() {
   const activeRoom = useAppSelector(state => state.ui.activeRoom);
 
   return (
-    <div className="h-screen flex flex-col bg-[#0d0d0f]">
+    <main className="h-screen max-h-screen flex flex-col ">
       {/* Top Navigation Bar */}
       <TopNavBar />
 
       {/* Control Bar */}
       <ControlBar />
 
-      {/* Room Tabs - Mobile/Tablet only */}
-      {/* <div className="lg:hidden">
-        <RoomTabs />
-      </div> */}
-
       {/* Main Content */}
-      <main className="flex-1 mx-1 sm:mx-4 lg:mx-6 overflow-hidden mt-2 mb-2  sm:my-6 ">
+      <div className="flex-1 mx-1 sm:mx-4 lg:mx-6 overflow-hidden space-y-4 mt-4  sm:my-6 ">
         {/* Pulse Header */}
         <PulseHeader />
         {/* Desktop: 3-column grid */}
@@ -43,13 +37,13 @@ export default function Home() {
             activeRoom={activeRoom === 'all' ? 'new_pairs' : activeRoom}
           />
         </div>
-      </main>
+      </div>
 
       {/* Desktop Bottom Bar */}
       <DesktopBottomBar />
 
       {/* Bottom Navigation - Mobile only */}
       <BottomNavigation />
-    </div>
+    </main>
   );
 }

@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export const DesktopHeader = () => {
   return (
-    <div className="hidden sm:flex items-center w-full h-8 gap-3">
+    <header className="hidden sm:flex items-center w-full h-8 gap-3">
       {/* Left Section: Title and Chain Selector */}
       <div className="flex-1 flex items-center gap-3">
         <span className="text-foreground text-xl font-medium">Pulse</span>
@@ -166,6 +166,6 @@ export const DesktopHeader = () => {
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
