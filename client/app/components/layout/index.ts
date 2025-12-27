@@ -1,6 +1,5 @@
 export { TopNavBar } from './TopNavBar';
-export { PulseHeader } from './PulseHeader';
-export { PulseControls } from './PulseControls';
+export { ControlBar } from './ControlBar';
 export { RoomTabs } from './RoomTabs';
 export { BottomNavigation } from './BottomNavigation';
 export { DesktopBottomBar } from './DesktopBottomBar';

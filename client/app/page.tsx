@@ -3,8 +3,7 @@
 import { TokenGrid } from './components/tokens';
 import {
   TopNavBar,
-  PulseHeader,
-  PulseControls,
+  ControlBar,
   RoomTabs,
   BottomNavigation,
   DesktopBottomBar,
@@ -19,11 +18,8 @@ export default function Home() {
       {/* Top Navigation Bar */}
       <TopNavBar />
 
-      {/* Pulse Header */}
-      <PulseHeader />
-
-      {/* Pulse Controls */}
-      <PulseControls />
+      {/* Control Bar */}
+      <ControlBar />
 
       {/* Room Tabs - Mobile/Tablet only */}
       <div className="lg:hidden">
