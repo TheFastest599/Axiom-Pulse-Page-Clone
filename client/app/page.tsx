@@ -7,6 +7,7 @@ import {
   RoomTabs,
   BottomNavigation,
   DesktopBottomBar,
+  PulseHeader,
 } from './components/layout';
 import { useAppSelector } from '@/store/hooks';
 
@@ -22,12 +23,14 @@ export default function Home() {
       <ControlBar />
 
       {/* Room Tabs - Mobile/Tablet only */}
-      <div className="lg:hidden">
+      {/* <div className="lg:hidden">
         <RoomTabs />
-      </div>
+      </div> */}
 
       {/* Main Content */}
-      <main className="flex-1 mx-1 sm:mx-4 lg:mx-6 overflow-hidden mb-0  sm:mb-6">
+      <main className="flex-1 mx-1 sm:mx-4 lg:mx-6 overflow-hidden mt-2 mb-2  sm:my-6 ">
+        {/* Pulse Header */}
+        <PulseHeader />
         {/* Desktop: 3-column grid */}
         <div className="hidden lg:block h-full">
           <TokenGrid singleColumn={false} />
