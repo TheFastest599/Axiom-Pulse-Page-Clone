@@ -324,107 +324,98 @@ const TokenCardComponent = ({
         <div className="flex flex-row w-full gap-3 pl-3 pr-3 py-2 justify-start items-center">
           <div className="flex flex-col items-center gap-1">
             <div className="relative w-18.5 h-18.5 justify-center items-center">
+              {protocolConfig && (
+                <div
+                  className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 cursor-pointer ${protocolConfig.borderColor}`}
+                  title={token.protocol.label}
+                >
+                  <div className="flex justify-center items-center bg-[#0d0d0f]  absolute w-3 h-3 rounded-full z-30">
+                    <img
+                      alt={token.protocol.label}
+                      width={10}
+                      height={10}
+                      src={protocolConfig.icon}
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
               <HoverCard openDelay={10}>
                 <HoverCardTrigger asChild>
-                  <div className="cursor-pointer w-full h-full group/image">
-                    {protocolConfig && (
-                      <div
-                        className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
-                      >
-                        <div className="flex justify-center items-center  absolute w-3 h-3 rounded-full z-30">
-                          <img
-                            alt={token.protocol.label}
-                            width={10}
-                            height={10}
-                            src={protocolConfig.icon}
-                            className="object-cover"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Camera icon overlay on hover */}
-                    {/* <div className="absolute left-0 top-0 w-20 h-20 P-1 rounded z-40 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity pointer-events-none">
-                      <div className="bg-black/60 w-full h-full flex items-center justify-center rounded">
-                        <i className="ri-camera-line text-white text-2xl"></i>
-                      </div>
-                    </div> */}
-
-                    <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center">
-                      <svg width="78" height="78" viewBox="0 0 78 78">
-                        <defs>
-                          <clipPath id={`rounded-clip-${token.id}`}>
-                            <rect
-                              x="5"
-                              y="5"
-                              width="68"
-                              height="68"
-                              rx="2"
-                              ry="2"
-                            />
-                          </clipPath>
-                        </defs>
-                        <path
-                          className={
-                            protocolConfig
-                              ? protocolConfig.color
-                              : 'text-gray-600'
-                          }
-                          style={{ opacity: 0.4 }}
-                          stroke="currentColor"
-                          fill="transparent"
-                          strokeWidth="1"
-                          d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                        />
-                        <path
-                          className={
-                            protocolConfig
-                              ? protocolConfig.color
-                              : 'text-gray-400'
-                          }
-                          stroke="currentColor"
-                          fill="transparent"
-                          strokeWidth="1"
-                          strokeLinecap="round"
-                          strokeDasharray={circumference}
-                          strokeDashoffset={strokeDashoffset}
-                          style={{
-                            transition: 'stroke-dashoffset 0.3s ease-in-out',
-                          }}
-                          d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                        />
-                        {/* Image */}
-                        <image
-                          href={token.image_url}
-                          x="5"
-                          y="5"
-                          width="68"
-                          height="68"
-                          clipPath={`url(#rounded-clip-${token.id})`}
-                          onError={e =>
-                            ((e.target as SVGImageElement).style.display =
-                              'none')
-                          }
-                        />
-                        {/* Camera icon overlay - clipped to same path */}
-                        <g clipPath={`url(#rounded-clip-${token.id})`}>
+                  <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center group/image cursor-pointer">
+                    <svg width="78" height="78" viewBox="0 0 78 78">
+                      <defs>
+                        <clipPath id={`rounded-clip-${token.id}`}>
                           <rect
                             x="5"
                             y="5"
                             width="68"
                             height="68"
-                            fill="black"
-                            fillOpacity="0"
-                            className="group-hover/image:fill-opacity-60 transition-all"
+                            rx="2"
+                            ry="2"
                           />
-                          <foreignObject x="5" y="5" width="68" height="68">
-                            <div className="bg-black/60 w-full h-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity">
-                              <i className="ri-camera-line text-white text-2xl"></i>
-                            </div>
-                          </foreignObject>
-                        </g>
-                      </svg>
-                    </div>
+                        </clipPath>
+                      </defs>
+                      <path
+                        className={
+                          protocolConfig
+                            ? protocolConfig.color
+                            : 'text-gray-600'
+                        }
+                        style={{ opacity: 0.4 }}
+                        stroke="currentColor"
+                        fill="transparent"
+                        strokeWidth="1"
+                        d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                      />
+                      <path
+                        className={
+                          protocolConfig
+                            ? protocolConfig.color
+                            : 'text-gray-400'
+                        }
+                        stroke="currentColor"
+                        fill="transparent"
+                        strokeWidth="1"
+                        strokeLinecap="round"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        style={{
+                          transition: 'stroke-dashoffset 0.3s ease-in-out',
+                        }}
+                        d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                      />
+                      {/* Image */}
+                      <image
+                        href={token.image_url}
+                        x="5"
+                        y="5"
+                        width="68"
+                        height="68"
+                        clipPath={`url(#rounded-clip-${token.id})`}
+                        onError={e =>
+                          ((e.target as SVGImageElement).style.display = 'none')
+                        }
+                      />
+                      {/* Camera icon overlay - clipped to same path */}
+                      <g clipPath={`url(#rounded-clip-${token.id})`}>
+                        <rect
+                          x="5"
+                          y="5"
+                          width="68"
+                          height="68"
+                          fill="black"
+                          fillOpacity="0"
+                          className="group-hover/image:fill-opacity-60 transition-all"
+                        />
+                        <foreignObject x="5" y="5" width="68" height="68">
+                          <div className="bg-black/60 w-full h-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity pointer-events-none">
+                            <i className="ri-camera-line text-white text-2xl"></i>
+                          </div>
+                        </foreignObject>
+                      </g>
+                    </svg>
                   </div>
                 </HoverCardTrigger>
                 <HoverCardContent

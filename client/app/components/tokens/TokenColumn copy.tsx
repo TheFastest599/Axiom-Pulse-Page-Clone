@@ -15,8 +15,7 @@ interface TokenColumnProps {
   title: string;
 }
 
-// Dynamic height estimation - cards vary based on content, social links, and breakpoints
-const ESTIMATED_ITEM_HEIGHT = 140; // Average height estimate
+const ESTIMATED_ITEM_HEIGHT = 118; // Approximate height of TokenCard
 
 export const TokenColumn = ({ room, title }: TokenColumnProps) => {
   const tokens = useAppSelector(state => state.data.tokens[room]);
@@ -103,17 +102,12 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
 
   const count = sortedTokens.length;
 
-  // Virtual list configuration with dynamic height measurement
+  // Virtual list configuration - simple version without measureElement
   const virtualizer = useVirtualizer({
     count: sortedTokens.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ESTIMATED_ITEM_HEIGHT,
     overscan: 5,
-    measureElement:
-      typeof window !== 'undefined' &&
-      navigator.userAgent.indexOf('Firefox') === -1
-        ? element => element?.getBoundingClientRect().height
-        : undefined,
   });
 
   const virtualItems = virtualizer.getVirtualItems();
@@ -142,8 +136,6 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
               return (
                 <div
                   key={item.token.id}
-                  data-index={virtualItem.index}
-                  ref={virtualizer.measureElement}
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -153,6 +145,7 @@ export const TokenColumn = ({ room, title }: TokenColumnProps) => {
                   }}
                   onMouseEnter={handleCardHoverStart}
                   onMouseLeave={handleCardHoverEnd}
+                  //   className="pb-2"
                 >
                   <TokenCard
                     token={item.token}

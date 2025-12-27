@@ -217,6 +217,58 @@ const TokenCardComponent = ({
         className="w-full h-full flex flex-col  border border-gray-800 hover:border-gray-700 transition-all relative group"
         style={style}
       >
+        {/* Top-left hidden buttons */}
+        <button
+          type="button"
+          className="absolute z-50 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primaryBlue/80 w-6 h-6 flex items-center justify-center rounded bg-background border border-border/50 cursor-pointer"
+          style={{ top: '6px', left: '6px' }}
+          title="Hide Token"
+        >
+          <i className="ri-eye-off-line text-sm"></i>
+        </button>
+        <button
+          type="button"
+          className="absolute z-50 opacity-0 group-hover:opacity-100 transition-opacity bg-background text-muted-foreground hover:text-primaryBlue/80 w-6 h-6 flex items-center justify-center rounded border border-border/50 cursor-pointer"
+          style={{ top: '32px', left: '6px' }}
+          title="Blacklist Dev"
+        >
+          <i className="ri-user-unfollow-line"></i>
+        </button>
+        {social_links.twitter && (
+          <button
+            type="button"
+            className="absolute z-50 opacity-0 group-hover:opacity-100 transition-opacity bg-background text-muted-foreground hover:text-primaryBlue/80 w-6 h-6 flex items-center justify-center rounded border border-border/50 cursor-pointer"
+            style={{ top: '58px', left: '6px' }}
+            title="Blacklist Twitter Profile"
+          >
+            <i className="ri-twitter-line"></i>
+          </button>
+        )}
+
+        {/* Mobile Quick Buy Button */}
+        <div className="absolute right-3 bottom-2.5 sm:right-4 sm:bottom-3 z-20 block sm:hidden">
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-400 text-[#090909] flex flex-row gap-1 justify-center items-center rounded-full h-6 px-1.5 whitespace-nowrap transition-all relative overflow-hidden"
+          >
+            <i className="ri-flashlight-fill text-base flex items-center relative z-10"></i>
+            <span className="text-xs font-bold relative z-10">0 SOL</span>
+          </button>
+        </div>
+
+        {/* Desktop Quick Buy Button */}
+        <div className="absolute right-3 bottom-4 sm:right-4 sm:bottom-4 z-20 hidden sm:block lg:opacity-0 lg:group-hover:opacity-100 xl:opacity-100 2xl:!opacity-100">
+          <div className="opacity-0 group-hover:opacity-100 2xl:!opacity-100">
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-400 text-[#090909] flex flex-row gap-1 justify-center items-center rounded-full h-6 px-1.5 whitespace-nowrap transition-all relative overflow-hidden"
+            >
+              <i className="ri-flashlight-fill text-base flex items-center relative z-10"></i>
+              <span className="text-xs font-bold relative z-10">0 SOL</span>
+            </button>
+          </div>
+        </div>
+
         <div className="absolute right-4 top-4 z-10">
           <div className="flex flex-col gap-0.5 items-end">
             <div className="relative">
@@ -224,7 +276,7 @@ const TokenCardComponent = ({
                 className="absolute z-0"
                 style={{ inset: '-12px -8px 1px -4px' }}
               >
-                <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
+                <div className="group-hover:bg-gray-800 absolute inset-0 z-10"></div>
                 <div className=" absolute inset-0 z-0"></div>
               </div>
               <div className="relative flex flex-row gap-2 justify-end items-end z-20">
@@ -255,7 +307,7 @@ const TokenCardComponent = ({
                 className="absolute z-0"
                 style={{ inset: '-12px -8px 1px -4px' }}
               >
-                <div className="group-hover:bg-gray-800/50 absolute inset-0 z-10"></div>
+                <div className="group-hover:bg-gray-800 absolute inset-0 z-10"></div>
                 <div className=" absolute inset-0 z-0"></div>
               </div>
               <div className="relative flex flex-row gap-2 justify-end items-end z-20">
@@ -277,7 +329,7 @@ const TokenCardComponent = ({
                 className="absolute z-0"
                 style={{ inset: '-2px -8px -4px -4px' }}
               >
-                <div className="group-hover:bg-gray-800/50 absolute inset-0 z-5 bg-[#0d0d0f]"></div>
+                <div className="group-hover:bg-gray-800 absolute inset-0 z-5 bg-[#0d0d0f]"></div>
                 <div className=" absolute inset-0 z-0"></div>
               </div>
               <div
@@ -324,107 +376,98 @@ const TokenCardComponent = ({
         <div className="flex flex-row w-full gap-3 pl-3 pr-3 py-2 justify-start items-center">
           <div className="flex flex-col items-center gap-1">
             <div className="relative w-18.5 h-18.5 justify-center items-center">
+              {protocolConfig && (
+                <div
+                  className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 cursor-pointer ${protocolConfig.borderColor}`}
+                  title={token.protocol.label}
+                >
+                  <div className="flex justify-center items-center bg-[#0d0d0f]  absolute w-3 h-3 rounded-full z-30">
+                    <img
+                      alt={token.protocol.label}
+                      width={10}
+                      height={10}
+                      src={protocolConfig.icon}
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
               <HoverCard openDelay={10}>
                 <HoverCardTrigger asChild>
-                  <div className="cursor-pointer w-full h-full group/image">
-                    {protocolConfig && (
-                      <div
-                        className={`flex absolute -bottom-2 -right-2 p-px w-4 h-4 justify-center items-center rounded-full z-30 border-2 ${protocolConfig.borderColor}`}
-                      >
-                        <div className="flex justify-center items-center  absolute w-3 h-3 rounded-full z-30">
-                          <img
-                            alt={token.protocol.label}
-                            width={10}
-                            height={10}
-                            src={protocolConfig.icon}
-                            className="object-cover"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Camera icon overlay on hover */}
-                    {/* <div className="absolute left-0 top-0 w-20 h-20 P-1 rounded z-40 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity pointer-events-none">
-                      <div className="bg-black/60 w-full h-full flex items-center justify-center rounded">
-                        <i className="ri-camera-line text-white text-2xl"></i>
-                      </div>
-                    </div> */}
-
-                    <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center">
-                      <svg width="78" height="78" viewBox="0 0 78 78">
-                        <defs>
-                          <clipPath id={`rounded-clip-${token.id}`}>
-                            <rect
-                              x="5"
-                              y="5"
-                              width="68"
-                              height="68"
-                              rx="2"
-                              ry="2"
-                            />
-                          </clipPath>
-                        </defs>
-                        <path
-                          className={
-                            protocolConfig
-                              ? protocolConfig.color
-                              : 'text-gray-600'
-                          }
-                          style={{ opacity: 0.4 }}
-                          stroke="currentColor"
-                          fill="transparent"
-                          strokeWidth="1"
-                          d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                        />
-                        <path
-                          className={
-                            protocolConfig
-                              ? protocolConfig.color
-                              : 'text-gray-400'
-                          }
-                          stroke="currentColor"
-                          fill="transparent"
-                          strokeWidth="1"
-                          strokeLinecap="round"
-                          strokeDasharray={circumference}
-                          strokeDashoffset={strokeDashoffset}
-                          style={{
-                            transition: 'stroke-dashoffset 0.3s ease-in-out',
-                          }}
-                          d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
-                        />
-                        {/* Image */}
-                        <image
-                          href={token.image_url}
-                          x="5"
-                          y="5"
-                          width="68"
-                          height="68"
-                          clipPath={`url(#rounded-clip-${token.id})`}
-                          onError={e =>
-                            ((e.target as SVGImageElement).style.display =
-                              'none')
-                          }
-                        />
-                        {/* Camera icon overlay - clipped to same path */}
-                        <g clipPath={`url(#rounded-clip-${token.id})`}>
+                  <div className="absolute top-0 left-0 w-20 h-20 rounded z-10 flex items-center justify-center group/image cursor-pointer">
+                    <svg width="78" height="78" viewBox="0 0 78 78">
+                      <defs>
+                        <clipPath id={`rounded-clip-${token.id}`}>
                           <rect
                             x="5"
                             y="5"
                             width="68"
                             height="68"
-                            fill="black"
-                            fillOpacity="0"
-                            className="group-hover/image:fill-opacity-60 transition-all"
+                            rx="2"
+                            ry="2"
                           />
-                          <foreignObject x="5" y="5" width="68" height="68">
-                            <div className="bg-black/60 w-full h-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity">
-                              <i className="ri-camera-line text-white text-2xl"></i>
-                            </div>
-                          </foreignObject>
-                        </g>
-                      </svg>
-                    </div>
+                        </clipPath>
+                      </defs>
+                      <path
+                        className={
+                          protocolConfig
+                            ? protocolConfig.color
+                            : 'text-gray-600'
+                        }
+                        style={{ opacity: 0.4 }}
+                        stroke="currentColor"
+                        fill="transparent"
+                        strokeWidth="1"
+                        d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                      />
+                      <path
+                        className={
+                          protocolConfig
+                            ? protocolConfig.color
+                            : 'text-gray-400'
+                        }
+                        stroke="currentColor"
+                        fill="transparent"
+                        strokeWidth="1"
+                        strokeLinecap="round"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        style={{
+                          transition: 'stroke-dashoffset 0.3s ease-in-out',
+                        }}
+                        d="M 76 76 L 6 76 Q 2 76 2 72 L 2 6 Q 2 2 6 2 L 72 2 Q 76 2 76 6 L 76 72 Q 76 76 76 76"
+                      />
+                      {/* Image */}
+                      <image
+                        href={token.image_url}
+                        x="5"
+                        y="5"
+                        width="68"
+                        height="68"
+                        clipPath={`url(#rounded-clip-${token.id})`}
+                        onError={e =>
+                          ((e.target as SVGImageElement).style.display = 'none')
+                        }
+                      />
+                      {/* Camera icon overlay - clipped to same path */}
+                      <g clipPath={`url(#rounded-clip-${token.id})`}>
+                        <rect
+                          x="5"
+                          y="5"
+                          width="68"
+                          height="68"
+                          fill="black"
+                          fillOpacity="0"
+                          className="group-hover/image:fill-opacity-60 transition-all"
+                        />
+                        <foreignObject x="5" y="5" width="68" height="68">
+                          <div className="bg-black/60 w-full h-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity pointer-events-none">
+                            <i className="ri-camera-line text-white text-2xl"></i>
+                          </div>
+                        </foreignObject>
+                      </g>
+                    </svg>
                   </div>
                 </HoverCardTrigger>
                 <HoverCardContent
@@ -474,7 +517,8 @@ const TokenCardComponent = ({
                   </div>
                 </div>
               </div>
-              <div className="flex flex-row w-full h-4.5 gap-3 justify-start items-center">
+
+              <div className=" flex flex-row w-full h-4.5 gap-3 justify-start items-center">
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-sm font-medium ${
@@ -525,7 +569,7 @@ const TokenCardComponent = ({
                   />
                 </div>
                 {/* distribution */}
-                <div className="flex flex-row flex-1 h-4.5 gap-2 justify-start items-center">
+                <div className="flex-row flex-1 h-4.5 gap-2 justify-start items-center hidden sm:flex md:hidden lg:hidden xl:flex">
                   <div
                     className="flex flex-row gap-0.5 h-4 justify-start items-center cursor-pointer"
                     title="Holders"
@@ -553,12 +597,72 @@ const TokenCardComponent = ({
                       {token.influence.kols_count}
                     </span>
                   </div>
+                  <div
+                    className="flex flex-row gap-0.5 h-4 justify-start items-center cursor-pointer"
+                    title="Top 10 Holders"
+                  >
+                    <i className="ri-vip-crown-2-line text-gray-400 text-base pb-[1.2px]"></i>
+                    <span className="text-white text-xs font-medium">
+                      0/{token.security.top_10_holders_pct.toFixed(0)}
+                    </span>
+                  </div>
+                  <div className="inline-flex items-center justify-center gap-1 text-muted-foreground leading-none">
+                    <i className="ri-eye-line text-base flex items-center"></i>
+                    <span className="text-[11px] font-medium flex items-center">
+                      2
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex sm:hidden md:flex lg:flex xl:hidden flex-row flex-1 h-4.5 gap-2 justify-start items-center pt-4">
+                <div
+                  className="flex flex-row gap-0.5 h-4 justify-start items-center cursor-pointer"
+                  title="Holders"
+                >
+                  <i className="ri-group-line text-gray-400 text-base"></i>
+                  <span className="text-xs font-medium text-white">
+                    {token.distribution.holders}
+                  </span>
+                </div>
+                <div
+                  className="flex flex-row gap-0.5 h-4 justify-center items-center shrink-0 cursor-pointer"
+                  title="Pro Traders"
+                >
+                  <i className="ri-stock-line text-gray-400 text-base "></i>
+                  <span className="text-white text-xs font-medium">
+                    {token.distribution.pro_traders}
+                  </span>
+                </div>
+                <div
+                  className="flex flex-row gap-0.5 h-4 justify-center items-center shrink-0 cursor-pointer"
+                  title="KOLs"
+                >
+                  <i className="ri-trophy-line text-gray-400 text-base "></i>
+                  <span className="text-white text-xs font-medium">
+                    {token.influence.kols_count}
+                  </span>
+                </div>
+                <div
+                  className="flex flex-row gap-0.5 h-4 justify-start items-center cursor-pointer"
+                  title="Top 10 Holders"
+                >
+                  <i className="ri-vip-crown-2-line text-gray-400 text-base pb-[1.2px]"></i>
+                  <span className="text-white text-xs font-medium">
+                    0/{token.security.top_10_holders_pct.toFixed(0)}
+                  </span>
+                </div>
+                <div className="inline-flex items-center justify-center gap-1 text-muted-foreground leading-none">
+                  <i className="ri-eye-line text-[9px] sm:text-base flex items-center"></i>
+                  <span className="text-[11px] sm:text-[11px] font-medium flex items-center">
+                    2
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Bottom Row */}
-            <div className="flex flex-row w-full h-6 gap-1 justify-start items-end">
+            <div className="hidden sm:flex md:hidden lg:hidden xl:flex flex-row w-full h-6 gap-1 justify-start items-end">
               <div
                 className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border cursor-pointer"
                 title="Developer Holdings"
@@ -668,14 +772,117 @@ const TokenCardComponent = ({
           </div>
         </div>
 
-        <div className="absolute right-3 bottom-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-400 text-[#090909] flex flex-row gap-1 justify-center items-center rounded-full h-6 px-1.5 whitespace-nowrap transition-all relative overflow-hidden"
+        {/* Mobile Bottom Row */}
+        <div className="flex sm:hidden md:flex lg:flex xl:hidden flex-row w-full h-6 gap-1 px-3 justify-start items-end">
+          <div
+            className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border cursor-pointer"
+            title="Developer Holdings"
           >
-            <i className="ri-flashlight-fill text-base flex items-center relative z-10"></i>
-            <span className="text-xs font-bold relative z-10">0 SOL</span>
-          </button>
+            <i
+              className={`ri-user-star-line text-sm ${
+                token.distribution.dev_status.dev_hold_percent > 5
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            ></i>
+            <span
+              className={`text-xs font-medium ${
+                token.distribution.dev_status.dev_hold_percent > 5
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            >
+              {token.distribution.dev_status.dev_hold_percent.toFixed(0)}%
+            </span>
+          </div>
+          <div
+            className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border cursor-pointer"
+            title="Bundle Holdings"
+          >
+            <i
+              className={`ri-archive-line text-sm ${
+                token.distribution.bundle_holding > 10
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            ></i>
+            <span
+              className={`text-xs font-medium ${
+                token.distribution.bundle_holding > 10
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            >
+              {token.distribution.bundle_holding.toFixed(0)}%
+            </span>
+          </div>
+          <div
+            className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border cursor-pointer"
+            title="Sniper Holdings"
+          >
+            <i
+              className={`ri-crosshair-2-line text-sm ${
+                token.distribution.snipers_holding > 10
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            ></i>
+            <span
+              className={`text-xs font-medium ${
+                token.distribution.snipers_holding > 10
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            >
+              {token.distribution.snipers_holding.toFixed(0)}%
+            </span>
+          </div>
+          <div
+            className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border cursor-pointer"
+            title="Top 10 Holders"
+          >
+            <i
+              className={`ri-vip-crown-2-line text-sm ${
+                token.security.top_10_holders_pct > 30
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            ></i>
+            <span
+              className={`text-xs font-medium ${
+                token.security.top_10_holders_pct > 30
+                  ? 'text-red-400'
+                  : 'text-green-400'
+              }`}
+            >
+              {token.security.top_10_holders_pct.toFixed(0)}%
+            </span>
+          </div>
+          <div
+            className="flex flex-row gap-1 shrink-0 h-6 px-1.25 justify-start items-center rounded-full bg-[#111113] border-gray-700/50 border cursor-pointer"
+            title="LP Burned"
+          >
+            <i
+              className={`ri-fire-line text-sm ${
+                token.security.lp_burned > 50
+                  ? 'text-green-400'
+                  : 'text-red-400'
+              }`}
+            ></i>
+            <span
+              className={`text-xs font-medium ${
+                token.security.lp_burned > 50
+                  ? 'text-green-400'
+                  : 'text-red-400'
+              }`}
+            >
+              {token.security.lp_burned}%
+            </span>
+          </div>
+        </div>
+
+        <div className="absolute right-3 bottom-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* This div is now empty - buttons moved to top of component */}
         </div>
       </div>
     </BondingTooltip>
